@@ -1,8 +1,8 @@
 const path = require('path')
-const config_dist = {
+const config_production = {
     entry: "./src/index.ts",
     output: {
-        filename: "index.js",
+        filename: "model.min.js",
         path: __dirname + "/dist"
     },
 
@@ -30,7 +30,41 @@ const config_dist = {
     // dependencies, which allows browsers to cache those libraries between builds.
     externals: {
     },
-    // mode:'',
+    mode:'production',
 };
 
-module.exports = config_dist;
+const config_development = {
+    entry: "./src/index.ts",
+    output: {
+        filename: "model.js",
+        path: __dirname + "/dist"
+    },
+
+    // Enable sourcemaps for debugging webpack's output.
+    devtool: "source-map",
+
+    resolve: {
+        // Add '.ts' and '.tsx' as resolvable extensions.
+        extensions: [".ts", ".tsx", ".js", ".json"]
+    },
+
+    module: {
+        rules: [
+            // All files with a '.ts' or '.tsx' extension will be handled by 'awesome-typescript-loader'.
+            { test: /\.ts?$/, loader: "awesome-typescript-loader" },
+
+            // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
+            { enforce: "pre", test: /\.js$/, loader: "source-map-loader" }
+        ]
+    },
+
+    // When importing a module whose path matches one of the following, just
+    // assume a corresponding global variable exists and use that instead.
+    // This is important because it allows us to avoid bundling all of our
+    // dependencies, which allows browsers to cache those libraries between builds.
+    externals: {
+    },
+    mode:'development',
+};
+
+module.exports = [config_development, config_production];
