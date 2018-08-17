@@ -62,12 +62,3 @@ typings/
 
 # vscode
 .vscode
-
-# output
-output
-
-#lib
-lib
-
-#dist
-dist
