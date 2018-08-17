@@ -1,11 +1,12 @@
 {
     "compilerOptions": {
-        "outDir": "../output/",
+        "outDir": "./lib",
         "sourceMap": true,
         "noImplicitAny": true,
         "module": "commonjs",
         "target": "es5",
-        "jsx": "preserve"
+        "jsx": "preserve",
+        "declaration": true
     },
     "include": [
         "./**/*"
