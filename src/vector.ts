@@ -1,15 +1,45 @@
 export class Vector {
     public static subVectors(vec1:Vector, vec2:Vector, result?:Vector):Vector {
-        if (! result) result = vec1.clone();
-        else result.copy(vec1);
-        result.sub(vec2);
+        if (! result) result = new Vector();
+        result.x = vec1.x - vec2.x;
+        result.y = vec1.y - vec2.y;
         return result;
     }
 
     public static addVectors(vec1:Vector, vec2:Vector, result?:Vector):Vector {
-        if (! result) result = vec1.clone();
-        else result.copy(vec1);
-        result.add(vec2);
+        if (! result) result = new Vector();
+        result.x = vec1.x + vec2.x;
+        result.y = vec1.y + vec2.y;
+        return result;
+    }
+
+    public static mulVectorMag(vec:Vector, magnitude:number, result?:Vector):Vector {
+        if (! result) result = new Vector();
+        result.x = vec.x * magnitude;
+        result.y = vec.y * magnitude;
+        return result;
+    }
+
+    public static normalVector(vec:Vector, result?:Vector):Vector {
+        if (! result) result = vec.clone();
+        else result.copy(vec);
+        result.normal();
+        return result;
+    }
+
+    public static dotVectors(vec1:Vector, vec2:Vector):number {
+        return vec1.x * vec2.x + vec1.y * vec2.y;
+    }
+
+    public static reflectVector(vec:Vector, normal:Vector, result?:Vector):Vector {
+        if (! result) result = new Vector();
+        else if (result == vec) {
+            throw new Error("The result shouldn't be argument vec.");
+        }
+        let dot = Vector.dotVectors(vec, normal);
+        result.copy(normal);
+        result.mulMag(dot * 2);
+        Vector.subVectors(vec, result, result);
         return result;
     }
 
@@ -39,6 +69,11 @@ export class Vector {
         this.y += target.y;
     }
 
+    mulMag(magnitude:number):void {
+        this.x *= magnitude;
+        this.y *= magnitude;
+    }
+
     magnitude():number {
         var x = this.x;
         var y = this.y;
@@ -55,5 +90,10 @@ export class Vector {
         let magnitude = this.magnitude();
         this.x /= magnitude;
         this.y /= magnitude;
+    }
+
+    zero():void {
+        this.x = 0;
+        this.y = 0;
     }
 }
