@@ -197,23 +197,18 @@ exports.Circle = Circle;
 
 "use strict";
 
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
 Object.defineProperty(exports, "__esModule", { value: true });
-var unit_1 = __webpack_require__(/*! ./unit */ "./src/unit.ts");
-exports.unitSize = unit_1.unitSize;
-var vector_1 = __webpack_require__(/*! ./vector */ "./src/vector.ts");
-exports.Vector = vector_1.Vector;
-var bounds_1 = __webpack_require__(/*! ./bounds */ "./src/bounds.ts");
-exports.Bounds = bounds_1.Bounds;
-var object_1 = __webpack_require__(/*! ./object */ "./src/object.ts");
-exports.Obj = object_1.Obj;
-var circle_1 = __webpack_require__(/*! ./circle */ "./src/circle.ts");
-exports.Circle = circle_1.Circle;
-var square_1 = __webpack_require__(/*! ./square */ "./src/square.ts");
-exports.Square = square_1.Square;
-var world_1 = __webpack_require__(/*! ./world */ "./src/world.ts");
-exports.World = world_1.World;
-var my_circle_1 = __webpack_require__(/*! ./my_circle */ "./src/my_circle.ts");
-exports.MyCircle = my_circle_1.MyCircle;
+__export(__webpack_require__(/*! ./unit */ "./src/unit.ts"));
+__export(__webpack_require__(/*! ./vector */ "./src/vector.ts"));
+__export(__webpack_require__(/*! ./bounds */ "./src/bounds.ts"));
+__export(__webpack_require__(/*! ./object */ "./src/object.ts"));
+__export(__webpack_require__(/*! ./circle */ "./src/circle.ts"));
+__export(__webpack_require__(/*! ./square */ "./src/square.ts"));
+__export(__webpack_require__(/*! ./world */ "./src/world.ts"));
+__export(__webpack_require__(/*! ./my_circle */ "./src/my_circle.ts"));
 
 
 /***/ }),
@@ -247,14 +242,29 @@ var vector_1 = __webpack_require__(/*! ./vector */ "./src/vector.ts");
 var MyCircle = /** @class */ (function (_super) {
     __extends(MyCircle, _super);
     function MyCircle() {
-        return _super.call(this) || this;
+        var _this = _super.call(this) || this;
+        _this._velocity = new vector_1.Vector();
+        return _this;
     }
+    Object.defineProperty(MyCircle.prototype, "velocity", {
+        get: function () {
+            return this._velocity;
+        },
+        set: function (value) {
+            this._velocity = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
     MyCircle.prototype.collide = function (target, result) {
         if (result == null)
             result = {
                 collided: false,
-                normal: null,
+                normal: new vector_1.Vector(),
             };
+        else {
+            result.collided = false;
+        }
         if (target instanceof circle_1.Circle) {
             var myCircle = this;
             var targetCircle = target;
@@ -264,7 +274,7 @@ var MyCircle = /** @class */ (function (_super) {
                 if (distance < (myCircle.radius + targetCircle.radius)) {
                     result.collided = true;
                     normal.normal();
-                    result.normal = normal;
+                    result.normal.copy(normal);
                 }
             }
         }
@@ -275,20 +285,60 @@ var MyCircle = /** @class */ (function (_super) {
                 var circleCenter = myCircle.pos;
                 var circleCenterX = circleCenter.x;
                 var circleCenterY = circleCenter.y;
+                var circleRadius = myCircle.radius;
                 var squareBounds = targetSquare.bounds;
                 if (circleCenterX > squareBounds.minX && circleCenterX < squareBounds.maxX) {
                     if (circleCenterY > squareBounds.minY && circleCenterY < squareBounds.maxY) {
                         //The center is inside the bounds (namely, inside the square).
                         result.collided = true;
-                        result.normal = null;
+                        vector_1.Vector.normalVector(myCircle.velocity, result.normal);
                     }
                     else if (circleCenterY > squareBounds.maxY) {
-                        //The center is upside the bounds.
+                        //The center is downside the bounds.
+                        if (circleCenterY - squareBounds.maxY < circleRadius) {
+                            result.collided = true;
+                            result.normal = new vector_1.Vector(0, 1);
+                        }
                     }
                     else if (circleCenterY < squareBounds.minY) {
+                        //The center is upside the bounds.
+                        if (squareBounds.minY - circleCenterY < circleRadius) {
+                            result.collided = true;
+                            result.normal = new vector_1.Vector(0, -1);
+                        }
                     }
                 }
                 else if (circleCenterY > squareBounds.minY && circleCenterY < squareBounds.maxY) {
+                    if (circleCenterX > squareBounds.maxX) {
+                        //The center is right of the bounds.
+                        if (circleCenterX - squareBounds.maxX < circleRadius) {
+                            result.collided = true;
+                            result.normal = new vector_1.Vector(1, 0);
+                        }
+                    }
+                    else if (circleCenterX < squareBounds.minX) {
+                        //The center is left of the bounds.
+                        if (squareBounds.minX - circleCenterX < circleRadius) {
+                            result.collided = true;
+                            result.normal = new vector_1.Vector(-1, 0);
+                        }
+                    }
+                }
+                else {
+                    //Detect if any point of square is inside the circle.
+                    var points = targetSquare.points;
+                    var pointCount = points.length;
+                    var pointHelper = new vector_1.Vector();
+                    var circleRadiusSquare = circleRadius * circleRadius;
+                    for (var i = 0; i < pointCount; ++i) {
+                        vector_1.Vector.subVectors(circleCenter, points[i], pointHelper);
+                        if (pointHelper.manitudeSquare() < circleRadiusSquare) {
+                            //The point is inside the circle.
+                            result.collided = true;
+                            vector_1.Vector.normalVector(pointHelper, result.normal);
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -320,7 +370,6 @@ var Obj = /** @class */ (function () {
     function Obj() {
         this._pos = new vector_1.Vector();
         this._bounds = new bounds_1.Bounds();
-        this._velocity = new vector_1.Vector();
     }
     Object.defineProperty(Obj.prototype, "pos", {
         get: function () {
@@ -335,16 +384,6 @@ var Obj = /** @class */ (function () {
     Object.defineProperty(Obj.prototype, "bounds", {
         get: function () {
             return this._bounds;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Obj.prototype, "velocity", {
-        get: function () {
-            return this._velocity;
-        },
-        set: function (value) {
-            this._velocity = value;
         },
         enumerable: true,
         configurable: true
@@ -381,10 +420,19 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var object_1 = __webpack_require__(/*! ./object */ "./src/object.ts");
 var unit_1 = __webpack_require__(/*! ./unit */ "./src/unit.ts");
+var vector_1 = __webpack_require__(/*! ./vector */ "./src/vector.ts");
 var Square = /** @class */ (function (_super) {
     __extends(Square, _super);
     function Square() {
-        return _super.call(this) || this;
+        var _this = _super.call(this) || this;
+        var points = [];
+        _this._points = points;
+        var POINT_COUNT = Square.POINT_COUNT;
+        points.length = POINT_COUNT;
+        for (var i = 0; i < POINT_COUNT; ++i) {
+            points[i] = new vector_1.Vector();
+        }
+        return _this;
     }
     Object.defineProperty(Square.prototype, "size", {
         get: function () {
@@ -403,10 +451,27 @@ var Square = /** @class */ (function (_super) {
             bounds.minY = pos.y - halfSize;
             bounds.maxX = pos.x + halfSize;
             bounds.maxY = pos.y + halfSize;
+            var points = this._points;
+            points[0].x = bounds.minX;
+            points[0].y = bounds.minY;
+            points[1].x = bounds.maxX;
+            points[1].y = bounds.minY;
+            points[2].x = bounds.maxX;
+            points[2].y = bounds.maxY;
+            points[3].x = bounds.minX;
+            points[3].y = bounds.maxY;
         },
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(Square.prototype, "points", {
+        get: function () {
+            return this._points;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Square.POINT_COUNT = 4;
     return Square;
 }(object_1.Obj));
 exports.Square = Square;
@@ -448,18 +513,46 @@ var Vector = /** @class */ (function () {
     }
     Vector.subVectors = function (vec1, vec2, result) {
         if (!result)
-            result = vec1.clone();
-        else
-            result.copy(vec1);
-        result.sub(vec2);
+            result = new Vector();
+        result.x = vec1.x - vec2.x;
+        result.y = vec1.y - vec2.y;
         return result;
     };
     Vector.addVectors = function (vec1, vec2, result) {
         if (!result)
-            result = vec1.clone();
+            result = new Vector();
+        result.x = vec1.x + vec2.x;
+        result.y = vec1.y + vec2.y;
+        return result;
+    };
+    Vector.mulVectorMag = function (vec, magnitude, result) {
+        if (!result)
+            result = new Vector();
+        result.x = vec.x * magnitude;
+        result.y = vec.y * magnitude;
+        return result;
+    };
+    Vector.normalVector = function (vec, result) {
+        if (!result)
+            result = vec.clone();
         else
-            result.copy(vec1);
-        result.add(vec2);
+            result.copy(vec);
+        result.normal();
+        return result;
+    };
+    Vector.dotVectors = function (vec1, vec2) {
+        return vec1.x * vec2.x + vec1.y * vec2.y;
+    };
+    Vector.reflectVector = function (vec, normal, result) {
+        if (!result)
+            result = new Vector();
+        else if (result == vec) {
+            throw new Error("The result shouldn't be argument vec.");
+        }
+        var dot = Vector.dotVectors(vec, normal);
+        result.copy(normal);
+        result.mulMag(dot * 2);
+        Vector.subVectors(vec, result, result);
         return result;
     };
     Vector.prototype.clone = function () {
@@ -477,15 +570,28 @@ var Vector = /** @class */ (function () {
         this.x += target.x;
         this.y += target.y;
     };
+    Vector.prototype.mulMag = function (magnitude) {
+        this.x *= magnitude;
+        this.y *= magnitude;
+    };
     Vector.prototype.magnitude = function () {
         var x = this.x;
         var y = this.y;
         return Math.sqrt(x * x + y * y);
     };
+    Vector.prototype.manitudeSquare = function () {
+        var x = this.x;
+        var y = this.y;
+        return x * x + y * y;
+    };
     Vector.prototype.normal = function () {
         var magnitude = this.magnitude();
         this.x /= magnitude;
         this.y /= magnitude;
+    };
+    Vector.prototype.zero = function () {
+        this.x = 0;
+        this.y = 0;
     };
     return Vector;
 }());
@@ -504,10 +610,100 @@ exports.Vector = Vector;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
+var vector_1 = __webpack_require__(/*! ./vector */ "./src/vector.ts");
+var my_circle_1 = __webpack_require__(/*! ./my_circle */ "./src/my_circle.ts");
 var World = /** @class */ (function () {
     function World() {
+        this.time = 0;
+        this.objectCount = 0;
         this.objects = [];
+        this.myObj = new my_circle_1.MyCircle();
     }
+    World.prototype.addObj = function (object) {
+        if (this.objectCount < this.objects.length) {
+            this.objects[this.objectCount++] = object;
+        }
+        else {
+            this.objects.length = 2 * this.objects.length;
+            this.objects[this.objectCount++] = object;
+        }
+    };
+    World.prototype.removeObj = function (object) {
+        var objectCount = this.objectCount;
+        var objects = this.objects;
+        for (var i = 0; i < objectCount; ++i) {
+            if (object == objects[i]) {
+                --objectCount;
+                if (i < objectCount) {
+                    objects[i] = objects[objectCount];
+                    objects[objectCount] = null;
+                }
+                this.objectCount = objectCount;
+                return;
+            }
+        }
+    };
+    World.prototype.clear = function () {
+        this.objectCount = 0;
+    };
+    Object.defineProperty(World.prototype, "myObject", {
+        get: function () {
+            return this.myObj;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    World.prototype.step = function (dt, iterations) {
+        dt = dt || 0;
+        iterations = iterations || 1;
+        var cachePosHelper = new vector_1.Vector();
+        var nextPosHelper = new vector_1.Vector();
+        var collisionResultHelper = { collided: false, normal: new vector_1.Vector() };
+        var collisionNormlHelper = new vector_1.Vector();
+        var reflectResultHelper = new vector_1.Vector();
+        var minDt = dt / iterations;
+        for (var iteration = 0; iteration < iterations; ++iteration) {
+            var objectCount = this.objectCount;
+            var objects = this.objects;
+            var myBody = this.myObj;
+            //Cache current position.
+            var cachePos = cachePosHelper;
+            cachePos.copy(myBody.pos);
+            //Caculate next position.
+            var nextPos = nextPosHelper;
+            nextPos.x = myBody.pos.x + myBody.velocity.x * minDt;
+            nextPos.y = myBody.pos.y + myBody.velocity.y * minDt;
+            myBody.pos = nextPos;
+            //Detect collision.
+            var collisioned = false;
+            var collisionResult = collisionResultHelper;
+            var collsionNormal = collisionNormlHelper;
+            collsionNormal.zero();
+            for (var i = 0; i < objectCount; ++i) {
+                var object = objects[i];
+                myBody.collide(object, collisionResult);
+                if (collisionResult.collided) {
+                    collisioned = true;
+                    collsionNormal.add(collisionResult.normal);
+                }
+            }
+            //Final collsion result.
+            var reflectResult = reflectResultHelper;
+            if (collisioned) {
+                //Recover to cached pre postion.
+                myBody.pos = cachePos;
+                //Set new velocity according to collision normal.
+                vector_1.Vector.reflectVector(myBody.velocity, collsionNormal, reflectResult);
+                myBody.velocity.copy(reflectResult);
+                //Move
+                var nextPos_1 = nextPosHelper;
+                nextPos_1.x = myBody.pos.x + myBody.velocity.x * minDt;
+                nextPos_1.y = myBody.pos.y + myBody.velocity.y * minDt;
+                myBody.pos = nextPos_1;
+            }
+        }
+        this.time += dt;
+    };
     return World;
 }());
 exports.World = World;

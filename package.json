@@ -1,6 +1,6 @@
 {
   "name": "model",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "game physics world shared between client and server.",
   "main": "./lib/index.js",
   "scripts": {
