@@ -150,13 +150,12 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var object_1 = __webpack_require__(/*! ./object */ "./src/object.ts");
-var bounds_1 = __webpack_require__(/*! ./bounds */ "./src/bounds.ts");
 var Circle = /** @class */ (function (_super) {
     __extends(Circle, _super);
     function Circle() {
         var _this = _super.call(this) || this;
-        _this._bounds = new bounds_1.Bounds;
         _this._radius = 0;
+        _this._setBounds();
         return _this;
     }
     Object.defineProperty(Circle.prototype, "radius", {
@@ -176,16 +175,20 @@ var Circle = /** @class */ (function (_super) {
         set: function (value) {
             var pos = this._pos;
             pos.copy(value);
-            var bounds = this._bounds;
-            var radius = this._radius;
-            bounds.minX = pos.x - radius;
-            bounds.minY = pos.y - radius;
-            bounds.maxX = pos.x + radius;
-            bounds.maxY = pos.y + radius;
+            this._setBounds();
         },
         enumerable: true,
         configurable: true
     });
+    Circle.prototype._setBounds = function () {
+        var pos = this._pos;
+        var bounds = this._bounds;
+        var radius = this._radius;
+        bounds.minX = pos.x - radius;
+        bounds.minY = pos.y - radius;
+        bounds.maxX = pos.x + radius;
+        bounds.maxY = pos.y + radius;
+    };
     return Circle;
 }(object_1.Obj));
 exports.Circle = Circle;
@@ -437,6 +440,8 @@ var Rectangle = /** @class */ (function (_super) {
         for (var i = 0; i < POINT_COUNT; ++i) {
             points[i] = new vector_1.Vector();
         }
+        _this._setBounds();
+        _this._setPoints();
         return _this;
     }
     Object.defineProperty(Rectangle.prototype, "width", {
@@ -466,22 +471,8 @@ var Rectangle = /** @class */ (function (_super) {
         set: function (value) {
             var pos = this._pos;
             pos.copy(value);
-            var bounds = this._bounds;
-            var halfWidth = this._width / 2;
-            var halfHeight = this._height / 2;
-            bounds.minX = pos.x - halfWidth;
-            bounds.minY = pos.y - halfHeight;
-            bounds.maxX = pos.x + halfWidth;
-            bounds.maxY = pos.y + halfHeight;
-            var points = this._points;
-            points[0].x = bounds.minX;
-            points[0].y = bounds.minY;
-            points[1].x = bounds.maxX;
-            points[1].y = bounds.minY;
-            points[2].x = bounds.maxX;
-            points[2].y = bounds.maxY;
-            points[3].x = bounds.minX;
-            points[3].y = bounds.maxY;
+            this._setBounds();
+            this._setPoints();
         },
         enumerable: true,
         configurable: true
@@ -493,6 +484,28 @@ var Rectangle = /** @class */ (function (_super) {
         enumerable: true,
         configurable: true
     });
+    Rectangle.prototype._setBounds = function () {
+        var pos = this._pos;
+        var bounds = this._bounds;
+        var halfWidth = this._width / 2;
+        var halfHeight = this._height / 2;
+        bounds.minX = pos.x - halfWidth;
+        bounds.minY = pos.y - halfHeight;
+        bounds.maxX = pos.x + halfWidth;
+        bounds.maxY = pos.y + halfHeight;
+    };
+    Rectangle.prototype._setPoints = function () {
+        var bounds = this._bounds;
+        var points = this._points;
+        points[0].x = bounds.minX;
+        points[0].y = bounds.minY;
+        points[1].x = bounds.maxX;
+        points[1].y = bounds.minY;
+        points[2].x = bounds.maxX;
+        points[2].y = bounds.maxY;
+        points[3].x = bounds.minX;
+        points[3].y = bounds.maxY;
+    };
     Rectangle.POINT_COUNT = 4;
     return Rectangle;
 }(object_1.Obj));

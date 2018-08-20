@@ -6,8 +6,8 @@ export class Circle extends Obj {
     private _radius:number;
     constructor() {
         super();
-        this._bounds = new Bounds;
         this._radius = 0;
+        this._setBounds();
     }
 
     get radius():number {
@@ -25,6 +25,11 @@ export class Circle extends Obj {
     set pos(value:Vector) {
         var pos = this._pos;
         pos.copy(value);
+        this._setBounds();
+    }
+
+    _setBounds() {
+        let pos = this._pos;
         var bounds = this._bounds;
         var radius = this._radius;
         bounds.minX = pos.x - radius;

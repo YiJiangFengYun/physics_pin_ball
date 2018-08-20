@@ -17,6 +17,8 @@ export class Rectangle extends Obj {
         for (let i = 0; i < POINT_COUNT; ++i) {
             points[i] = new Vector();
         }
+        this._setBounds();
+        this._setPoints();
     }
 
     get width() {
@@ -42,14 +44,29 @@ export class Rectangle extends Obj {
     set pos(value:Vector) {
         var pos = this._pos;
         pos.copy(value);
-        var bounds = this._bounds;
-        var halfWidth = this._width / 2;
-        var halfHeight = this._height / 2;
+        
+        this._setBounds();
+        this._setPoints();
+        
+    }
+
+    get points() {
+        return this._points;
+    }
+
+    _setBounds() {
+        let pos = this._pos;
+        let bounds = this._bounds;
+        let halfWidth = this._width / 2;
+        let halfHeight = this._height / 2;
         bounds.minX = pos.x - halfWidth;
         bounds.minY = pos.y - halfHeight;
         bounds.maxX = pos.x + halfWidth;
         bounds.maxY = pos.y + halfHeight;
+    }
 
+    _setPoints() {
+        let bounds = this._bounds;
         let points = this._points;
         points[0].x = bounds.minX;
         points[0].y = bounds.minY;
@@ -59,9 +76,5 @@ export class Rectangle extends Obj {
         points[2].y = bounds.maxY;
         points[3].x = bounds.minX;
         points[3].y = bounds.maxY;
-    }
-
-    get points() {
-        return this._points;
     }
 }

@@ -10,4 +10,6 @@ export declare class Rectangle extends Obj {
     height: number;
     pos: Vector;
     readonly points: Vector[];
+    _setBounds(): void;
+    _setPoints(): void;
 }
