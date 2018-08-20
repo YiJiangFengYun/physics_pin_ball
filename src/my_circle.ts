@@ -5,8 +5,20 @@ import { Vector } from "./vector";
 
 export class MyCircle extends Circle {
 
+    private _velocity:Vector;
+
     constructor() {
         super();
+        this._velocity = new Vector();
+
+    }
+
+    get velocity():Vector {
+        return this._velocity;
+    }
+
+    set velocity(value:Vector) {
+        this._velocity = value;
     }
 
     collide(target:Obj, result?:{collided: boolean; normal:Vector;}) {
