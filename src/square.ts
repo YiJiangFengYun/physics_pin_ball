@@ -20,6 +20,10 @@ export class Square extends Obj {
         return unitSize;
     }
 
+    get pos() {
+        return this._pos;
+    }
+
     set pos(value:Vector) {
         var pos = this._pos;
         pos.copy(value);
