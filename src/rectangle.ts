@@ -55,9 +55,7 @@ export class Rectangle extends Obj {
     }
 
     updatePos(value?:Vector) {
-        if (value) {
-            this._pos = value;
-        }
+        super.updatePos(value);
         this._setBounds();
         this._setPoints();
     }

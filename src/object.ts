@@ -20,4 +20,10 @@ export abstract class Obj {
     get bounds():Bounds {
         return this._bounds;
     }
+
+    updatePos(value?:Vector) {
+        if (value) {
+            this._pos = value;
+        }
+    }
 }

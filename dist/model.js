@@ -181,9 +181,7 @@ var Circle = /** @class */ (function (_super) {
         configurable: true
     });
     Circle.prototype.updatePos = function (value) {
-        if (value) {
-            this._pos = value;
-        }
+        _super.prototype.updatePos.call(this, value);
         this._setBounds();
     };
     Circle.prototype._setBounds = function () {
@@ -401,6 +399,11 @@ var Obj = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
+    Obj.prototype.updatePos = function (value) {
+        if (value) {
+            this._pos = value;
+        }
+    };
     return Obj;
 }());
 exports.Obj = Obj;
@@ -488,9 +491,7 @@ var Rectangle = /** @class */ (function (_super) {
         configurable: true
     });
     Rectangle.prototype.updatePos = function (value) {
-        if (value) {
-            this._pos = value;
-        }
+        _super.prototype.updatePos.call(this, value);
         this._setBounds();
         this._setPoints();
     };

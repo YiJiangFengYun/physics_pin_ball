@@ -6,4 +6,5 @@ export declare abstract class Obj {
     constructor();
     pos: Vector;
     readonly bounds: Bounds;
+    updatePos(value?: Vector): void;
 }
