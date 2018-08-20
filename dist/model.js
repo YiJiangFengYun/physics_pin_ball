@@ -150,19 +150,21 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var object_1 = __webpack_require__(/*! ./object */ "./src/object.ts");
-var unit_1 = __webpack_require__(/*! ./unit */ "./src/unit.ts");
 var bounds_1 = __webpack_require__(/*! ./bounds */ "./src/bounds.ts");
 var Circle = /** @class */ (function (_super) {
     __extends(Circle, _super);
     function Circle() {
         var _this = _super.call(this) || this;
         _this._bounds = new bounds_1.Bounds;
-        _this._radius = unit_1.unitSize / 2;
+        _this._radius = 0;
         return _this;
     }
     Object.defineProperty(Circle.prototype, "radius", {
         get: function () {
             return this._radius;
+        },
+        set: function (value) {
+            this._radius = value;
         },
         enumerable: true,
         configurable: true
@@ -204,7 +206,6 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 Object.defineProperty(exports, "__esModule", { value: true });
-__export(__webpack_require__(/*! ./unit */ "./src/unit.ts"));
 __export(__webpack_require__(/*! ./vector */ "./src/vector.ts"));
 __export(__webpack_require__(/*! ./bounds */ "./src/bounds.ts"));
 __export(__webpack_require__(/*! ./object */ "./src/object.ts"));
@@ -422,12 +423,12 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var object_1 = __webpack_require__(/*! ./object */ "./src/object.ts");
-var unit_1 = __webpack_require__(/*! ./unit */ "./src/unit.ts");
 var vector_1 = __webpack_require__(/*! ./vector */ "./src/vector.ts");
 var Square = /** @class */ (function (_super) {
     __extends(Square, _super);
     function Square() {
         var _this = _super.call(this) || this;
+        _this._size = 0;
         var points = [];
         _this._points = points;
         var POINT_COUNT = Square.POINT_COUNT;
@@ -439,7 +440,10 @@ var Square = /** @class */ (function (_super) {
     }
     Object.defineProperty(Square.prototype, "size", {
         get: function () {
-            return unit_1.unitSize;
+            return this._size;
+        },
+        set: function (value) {
+            this._size = value;
         },
         enumerable: true,
         configurable: true
@@ -481,21 +485,6 @@ var Square = /** @class */ (function (_super) {
     return Square;
 }(object_1.Obj));
 exports.Square = Square;
-
-
-/***/ }),
-
-/***/ "./src/unit.ts":
-/*!*********************!*\
-  !*** ./src/unit.ts ***!
-  \*********************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.unitSize = 100;
 
 
 /***/ }),

@@ -1,5 +1,4 @@
 import { Obj } from "./object";
-import { unitSize } from "./unit";
 import { Bounds } from "./bounds";
 import { Vector } from "./vector";
 
@@ -8,11 +7,15 @@ export class Circle extends Obj {
     constructor() {
         super();
         this._bounds = new Bounds;
-        this._radius = unitSize / 2;
+        this._radius = 0;
     }
 
     get radius():number {
         return this._radius;
+    }
+
+    set radius(value:number) {
+        this._radius = value;
     }
 
     get pos() {

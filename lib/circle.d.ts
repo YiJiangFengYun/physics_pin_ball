@@ -3,6 +3,6 @@ import { Vector } from "./vector";
 export declare class Circle extends Obj {
     private _radius;
     constructor();
-    readonly radius: number;
+    radius: number;
     pos: Vector;
 }

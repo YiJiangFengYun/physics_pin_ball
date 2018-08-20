@@ -1,12 +1,13 @@
 import { Obj } from "./object";
-import { unitSize } from "./unit";
 import { Vector } from "./vector";
 
 export class Square extends Obj {
+    private _size:number;
     static POINT_COUNT:number = 4;
     private _points:Vector[];
     constructor() {
         super();
+        this._size = 0;
         let points:Vector[] = [];
         this._points = points;
         const POINT_COUNT = Square.POINT_COUNT;
@@ -17,7 +18,11 @@ export class Square extends Obj {
     }
 
     get size() {
-        return unitSize;
+        return this._size;
+    }
+
+    set size(value:number) {
+        this._size = value;
     }
 
     get pos() {
