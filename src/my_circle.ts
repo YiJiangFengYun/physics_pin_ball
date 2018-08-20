@@ -1,6 +1,6 @@
 import { Circle } from "./circle";
 import { Obj } from "./object";
-import { Square } from "./square";
+import { Rectangle } from "./rectangle";
 import { Vector } from "./vector";
 
 export interface ICollideResult {
@@ -45,9 +45,9 @@ export class MyCircle extends Circle {
                     result.normal.copy(normal);
                 }
             }
-        } else if (target instanceof Square) {
+        } else if (target instanceof Rectangle) {
             let myCircle = this;
-            let targetSquare = target as Square;
+            let targetSquare = target as Rectangle;
             if (myCircle.bounds.intersect(targetSquare.bounds)) {
                 let circleCenter = myCircle.pos;
                 let circleCenterX = circleCenter.x;

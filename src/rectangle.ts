@@ -1,28 +1,38 @@
 import { Obj } from "./object";
 import { Vector } from "./vector";
 
-export class Square extends Obj {
-    private _size:number;
+export class Rectangle extends Obj {
+    private _width:number;
+    private _height:number;
     static POINT_COUNT:number = 4;
     private _points:Vector[];
     constructor() {
         super();
-        this._size = 0;
+        this._width = 0;
+        this._height = 0;
         let points:Vector[] = [];
         this._points = points;
-        const POINT_COUNT = Square.POINT_COUNT;
+        const POINT_COUNT = Rectangle.POINT_COUNT;
         points.length = POINT_COUNT;
         for (let i = 0; i < POINT_COUNT; ++i) {
             points[i] = new Vector();
         }
     }
 
-    get size() {
-        return this._size;
+    get width() {
+        return this._width;
     }
 
-    set size(value:number) {
-        this._size = value;
+    set width(value:number) {
+        this._width = value;
+    }
+
+    get height() {
+        return this._height;
+    }
+
+    set height(value:number) {
+        this._height = value;
     }
 
     get pos() {
@@ -33,11 +43,12 @@ export class Square extends Obj {
         var pos = this._pos;
         pos.copy(value);
         var bounds = this._bounds;
-        var halfSize = this.size / 2;
-        bounds.minX = pos.x - halfSize;
-        bounds.minY = pos.y - halfSize;
-        bounds.maxX = pos.x + halfSize;
-        bounds.maxY = pos.y + halfSize;
+        var halfWidth = this._width / 2;
+        var halfHeight = this._height / 2;
+        bounds.minX = pos.x - halfWidth;
+        bounds.minY = pos.y - halfHeight;
+        bounds.maxX = pos.x + halfWidth;
+        bounds.maxY = pos.y + halfHeight;
 
         let points = this._points;
         points[0].x = bounds.minX;

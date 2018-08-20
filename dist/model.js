@@ -210,7 +210,7 @@ __export(__webpack_require__(/*! ./vector */ "./src/vector.ts"));
 __export(__webpack_require__(/*! ./bounds */ "./src/bounds.ts"));
 __export(__webpack_require__(/*! ./object */ "./src/object.ts"));
 __export(__webpack_require__(/*! ./circle */ "./src/circle.ts"));
-__export(__webpack_require__(/*! ./square */ "./src/square.ts"));
+__export(__webpack_require__(/*! ./rectangle */ "./src/rectangle.ts"));
 __export(__webpack_require__(/*! ./world */ "./src/world.ts"));
 __export(__webpack_require__(/*! ./my_circle */ "./src/my_circle.ts"));
 
@@ -241,7 +241,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var circle_1 = __webpack_require__(/*! ./circle */ "./src/circle.ts");
-var square_1 = __webpack_require__(/*! ./square */ "./src/square.ts");
+var rectangle_1 = __webpack_require__(/*! ./rectangle */ "./src/rectangle.ts");
 var vector_1 = __webpack_require__(/*! ./vector */ "./src/vector.ts");
 var MyCircle = /** @class */ (function (_super) {
     __extends(MyCircle, _super);
@@ -282,7 +282,7 @@ var MyCircle = /** @class */ (function (_super) {
                 }
             }
         }
-        else if (target instanceof square_1.Square) {
+        else if (target instanceof rectangle_1.Rectangle) {
             var myCircle = this;
             var targetSquare = target;
             if (myCircle.bounds.intersect(targetSquare.bounds)) {
@@ -399,10 +399,10 @@ exports.Obj = Obj;
 
 /***/ }),
 
-/***/ "./src/square.ts":
-/*!***********************!*\
-  !*** ./src/square.ts ***!
-  \***********************/
+/***/ "./src/rectangle.ts":
+/*!**************************!*\
+  !*** ./src/rectangle.ts ***!
+  \**************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -424,31 +424,42 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var object_1 = __webpack_require__(/*! ./object */ "./src/object.ts");
 var vector_1 = __webpack_require__(/*! ./vector */ "./src/vector.ts");
-var Square = /** @class */ (function (_super) {
-    __extends(Square, _super);
-    function Square() {
+var Rectangle = /** @class */ (function (_super) {
+    __extends(Rectangle, _super);
+    function Rectangle() {
         var _this = _super.call(this) || this;
-        _this._size = 0;
+        _this._width = 0;
+        _this._height = 0;
         var points = [];
         _this._points = points;
-        var POINT_COUNT = Square.POINT_COUNT;
+        var POINT_COUNT = Rectangle.POINT_COUNT;
         points.length = POINT_COUNT;
         for (var i = 0; i < POINT_COUNT; ++i) {
             points[i] = new vector_1.Vector();
         }
         return _this;
     }
-    Object.defineProperty(Square.prototype, "size", {
+    Object.defineProperty(Rectangle.prototype, "width", {
         get: function () {
-            return this._size;
+            return this._width;
         },
         set: function (value) {
-            this._size = value;
+            this._width = value;
         },
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(Square.prototype, "pos", {
+    Object.defineProperty(Rectangle.prototype, "height", {
+        get: function () {
+            return this._height;
+        },
+        set: function (value) {
+            this._height = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Rectangle.prototype, "pos", {
         get: function () {
             return this._pos;
         },
@@ -456,11 +467,12 @@ var Square = /** @class */ (function (_super) {
             var pos = this._pos;
             pos.copy(value);
             var bounds = this._bounds;
-            var halfSize = this.size / 2;
-            bounds.minX = pos.x - halfSize;
-            bounds.minY = pos.y - halfSize;
-            bounds.maxX = pos.x + halfSize;
-            bounds.maxY = pos.y + halfSize;
+            var halfWidth = this._width / 2;
+            var halfHeight = this._height / 2;
+            bounds.minX = pos.x - halfWidth;
+            bounds.minY = pos.y - halfHeight;
+            bounds.maxX = pos.x + halfWidth;
+            bounds.maxY = pos.y + halfHeight;
             var points = this._points;
             points[0].x = bounds.minX;
             points[0].y = bounds.minY;
@@ -474,17 +486,17 @@ var Square = /** @class */ (function (_super) {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(Square.prototype, "points", {
+    Object.defineProperty(Rectangle.prototype, "points", {
         get: function () {
             return this._points;
         },
         enumerable: true,
         configurable: true
     });
-    Square.POINT_COUNT = 4;
-    return Square;
+    Rectangle.POINT_COUNT = 4;
+    return Rectangle;
 }(object_1.Obj));
-exports.Square = Square;
+exports.Rectangle = Rectangle;
 
 
 /***/ }),
