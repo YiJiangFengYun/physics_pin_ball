@@ -15,6 +15,10 @@ export class Circle extends Obj {
         return this._radius;
     }
 
+    get pos() {
+        return this._pos;
+    }
+
     set pos(value:Vector) {
         var pos = this._pos;
         pos.copy(value);
