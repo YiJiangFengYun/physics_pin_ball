@@ -180,6 +180,12 @@ var Circle = /** @class */ (function (_super) {
         enumerable: true,
         configurable: true
     });
+    Circle.prototype.updatePos = function (value) {
+        if (value) {
+            this._pos = value;
+        }
+        this._setBounds();
+    };
     Circle.prototype._setBounds = function () {
         var pos = this._pos;
         var bounds = this._bounds;
@@ -481,6 +487,13 @@ var Rectangle = /** @class */ (function (_super) {
         enumerable: true,
         configurable: true
     });
+    Rectangle.prototype.updatePos = function (value) {
+        if (value) {
+            this._pos = value;
+        }
+        this._setBounds();
+        this._setPoints();
+    };
     Object.defineProperty(Rectangle.prototype, "points", {
         get: function () {
             return this._points;

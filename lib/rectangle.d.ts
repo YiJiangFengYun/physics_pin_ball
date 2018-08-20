@@ -9,6 +9,7 @@ export declare class Rectangle extends Obj {
     width: number;
     height: number;
     pos: Vector;
+    updatePos(value?: Vector): void;
     readonly points: Vector[];
     _setBounds(): void;
     _setPoints(): void;

@@ -28,6 +28,13 @@ export class Circle extends Obj {
         this._setBounds();
     }
 
+    updatePos(value?:Vector) {
+        if (value) {
+            this._pos = value;
+        }
+        this._setBounds();
+    }
+
     _setBounds() {
         let pos = this._pos;
         var bounds = this._bounds;
