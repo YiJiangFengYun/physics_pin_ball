@@ -45,6 +45,12 @@ export class Vector {
         return Math.sqrt(x * x + y * y);
     }
 
+    manitudeSquare():number {
+        var x = this.x;
+        var y = this.y;
+        return x * x + y * y;
+    }
+
     normal():void {
         let magnitude = this.magnitude();
         this.x /= magnitude;
