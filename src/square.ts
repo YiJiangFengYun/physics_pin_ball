@@ -3,8 +3,17 @@ import { unitSize } from "./unit";
 import { Vector } from "./vector";
 
 export class Square extends Obj {
+    static POINT_COUNT:number = 4;
+    private _points:Vector[];
     constructor() {
         super();
+        let points:Vector[] = [];
+        this._points = points;
+        const POINT_COUNT = Square.POINT_COUNT;
+        points.length = POINT_COUNT;
+        for (let i = 0; i < POINT_COUNT; ++i) {
+            points[i] = new Vector();
+        }
     }
 
     get size() {
@@ -20,5 +29,19 @@ export class Square extends Obj {
         bounds.minY = pos.y - halfSize;
         bounds.maxX = pos.x + halfSize;
         bounds.maxY = pos.y + halfSize;
+
+        let points = this._points;
+        points[0].x = bounds.minX;
+        points[0].y = bounds.minY;
+        points[1].x = bounds.maxX;
+        points[1].y = bounds.minY;
+        points[2].x = bounds.maxX;
+        points[2].y = bounds.maxY;
+        points[3].x = bounds.minX;
+        points[3].y = bounds.maxY;
+    }
+
+    get points() {
+        return this._points;
     }
 }
