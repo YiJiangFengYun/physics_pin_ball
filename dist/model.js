@@ -168,6 +168,9 @@ var Circle = /** @class */ (function (_super) {
         configurable: true
     });
     Object.defineProperty(Circle.prototype, "pos", {
+        get: function () {
+            return this._pos;
+        },
         set: function (value) {
             var pos = this._pos;
             pos.copy(value);
@@ -442,6 +445,9 @@ var Square = /** @class */ (function (_super) {
         configurable: true
     });
     Object.defineProperty(Square.prototype, "pos", {
+        get: function () {
+            return this._pos;
+        },
         set: function (value) {
             var pos = this._pos;
             pos.copy(value);
