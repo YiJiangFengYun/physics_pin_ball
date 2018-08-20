@@ -27,6 +27,8 @@ export class Rectangle extends Obj {
 
     set width(value:number) {
         this._width = value;
+        this._setBounds();
+        this._setPoints();
     }
 
     get height() {
@@ -35,6 +37,8 @@ export class Rectangle extends Obj {
 
     set height(value:number) {
         this._height = value;
+        this._setBounds();
+        this._setPoints();
     }
 
     get pos() {

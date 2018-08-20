@@ -450,6 +450,8 @@ var Rectangle = /** @class */ (function (_super) {
         },
         set: function (value) {
             this._width = value;
+            this._setBounds();
+            this._setPoints();
         },
         enumerable: true,
         configurable: true
@@ -460,6 +462,8 @@ var Rectangle = /** @class */ (function (_super) {
         },
         set: function (value) {
             this._height = value;
+            this._setBounds();
+            this._setPoints();
         },
         enumerable: true,
         configurable: true
