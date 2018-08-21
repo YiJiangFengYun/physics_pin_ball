@@ -219,6 +219,7 @@ __export(__webpack_require__(/*! ./bounds */ "./src/bounds.ts"));
 __export(__webpack_require__(/*! ./object */ "./src/object.ts"));
 __export(__webpack_require__(/*! ./circle */ "./src/circle.ts"));
 __export(__webpack_require__(/*! ./rectangle */ "./src/rectangle.ts"));
+__export(__webpack_require__(/*! ./triangle */ "./src/triangle.ts"));
 __export(__webpack_require__(/*! ./world */ "./src/world.ts"));
 __export(__webpack_require__(/*! ./my_circle */ "./src/my_circle.ts"));
 
@@ -251,6 +252,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var circle_1 = __webpack_require__(/*! ./circle */ "./src/circle.ts");
 var rectangle_1 = __webpack_require__(/*! ./rectangle */ "./src/rectangle.ts");
 var vector_1 = __webpack_require__(/*! ./vector */ "./src/vector.ts");
+var triangle_1 = __webpack_require__(/*! ./triangle */ "./src/triangle.ts");
 var MyCircle = /** @class */ (function (_super) {
     __extends(MyCircle, _super);
     function MyCircle() {
@@ -299,19 +301,84 @@ var MyCircle = /** @class */ (function (_super) {
                 var circleCenterY = circleCenter.y;
                 var circleRadius = myCircle.radius;
                 var squareBounds = targetSquare.bounds;
+                if (circleCenterX > squareBounds.minX && circleCenterX < squareBounds.maxX) {
+                    if (circleCenterY > squareBounds.minY && circleCenterY < squareBounds.maxY) {
+                        //The center is inside the bounds (namely, inside the square).
+                        result.collided = true;
+                        vector_1.Vector.normalVector(myCircle.velocity, result.normal);
+                    }
+                    else if (circleCenterY > squareBounds.maxY) {
+                        //The center is downside the bounds.
+                        if (circleCenterY - squareBounds.maxY < circleRadius) {
+                            result.collided = true;
+                            result.normal = new vector_1.Vector(0, 1);
+                        }
+                    }
+                    else if (circleCenterY < squareBounds.minY) {
+                        //The center is upside the bounds.
+                        if (squareBounds.minY - circleCenterY < circleRadius) {
+                            result.collided = true;
+                            result.normal = new vector_1.Vector(0, -1);
+                        }
+                    }
+                }
+                else if (circleCenterY > squareBounds.minY && circleCenterY < squareBounds.maxY) {
+                    if (circleCenterX > squareBounds.maxX) {
+                        //The center is right of the bounds.
+                        if (circleCenterX - squareBounds.maxX < circleRadius) {
+                            result.collided = true;
+                            result.normal = new vector_1.Vector(1, 0);
+                        }
+                    }
+                    else if (circleCenterX < squareBounds.minX) {
+                        //The center is left of the bounds.
+                        if (squareBounds.minX - circleCenterX < circleRadius) {
+                            result.collided = true;
+                            result.normal = new vector_1.Vector(-1, 0);
+                        }
+                    }
+                }
+                else {
+                    //Detect if any point of square is inside the circle.
+                    var points = targetSquare.points;
+                    var pointCount = points.length;
+                    var pointHelper = new vector_1.Vector();
+                    var circleRadiusSquare = circleRadius * circleRadius;
+                    for (var i = 0; i < pointCount; ++i) {
+                        vector_1.Vector.subVectors(circleCenter, points[i], pointHelper);
+                        if (pointHelper.manitudeSquare() < circleRadiusSquare) {
+                            //The point is inside the circle.
+                            result.collided = true;
+                            vector_1.Vector.normalVector(pointHelper, result.normal);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        else if (target instanceof triangle_1.IRTriangle) {
+            var myCircle = this;
+            var targetTriangle = target;
+            if (myCircle.bounds.intersect(targetTriangle.bounds)) {
+                var circleCenter = myCircle.pos;
+                var circleCenterPos = [circleCenter.x, circleCenter.y];
+                var circleRadius = myCircle.radius;
+                var triangleBounds = targetTriangle.bounds;
+                var triangleBoundsMin = [triangleBounds.minX, triangleBounds.minY];
+                var triangleBoundsMax = [triangleBounds.maxX, triangleBounds.maxY];
                 //00 is left 01 is midle 10 is right
                 //First two bit is x and second two bit is y.
                 var circlArea = 0;
-                if (circleCenterX > squareBounds.minX && circleCenterX < squareBounds.maxX) {
+                if (circleCenterPos[0] > triangleBoundsMin[0] && circleCenterPos[0] < triangleBoundsMax[0]) {
                     circlArea |= 1;
                 }
-                else if (circleCenterX > squareBounds.maxX) {
+                else if (circleCenterPos[0] > triangleBoundsMax[0]) {
                     circlArea |= 2;
                 }
-                if (circleCenterY > squareBounds.minY && circleCenterY < squareBounds.maxY) {
+                if (circleCenterPos[1] > triangleBoundsMin[1] && circleCenterPos[1] < triangleBoundsMax[1]) {
                     circlArea |= (1 << 2);
                 }
-                else if (circleCenterY > squareBounds.maxY) {
+                else if (circleCenterPos[1] > triangleBoundsMax[1]) {
                     circlArea |= (2 << 2);
                 }
                 //rectangle 9 area.
@@ -320,29 +387,54 @@ var MyCircle = /** @class */ (function (_super) {
                     for (var areaY = 0; areaY < 3; ++areaY) {
                         if ((circlArea ^ areaX) == 0 && ((circlArea >> 2) ^ areaY) == 0) {
                             findArea = true;
-                            //There 3 possible condition for each area.
-                            if (areaX == 1 && areaY == 1) {
-                                //The center is inside the bounds (namely, inside the square).
-                                result.collided = true;
-                                vector_1.Vector.normalVector(myCircle.velocity, result.normal);
-                            }
-                            else if (areaX != 1 && areaY != 1) {
-                                //The circle is corner of the square.
-                                //Detect if any point of square is inside the circle.
-                                var points = targetSquare.points;
-                                var point = points[((areaY >> 1) << 1) | (areaX >> 1)];
-                                var pointHelper = new vector_1.Vector();
-                                var circleRadiusSquare = circleRadius * circleRadius;
-                                vector_1.Vector.subVectors(circleCenter, point, pointHelper);
-                                if (pointHelper.manitudeSquare() < circleRadiusSquare) {
-                                    //The point is inside the circle.
-                                    result.collided = true;
-                                    vector_1.Vector.normalVector(pointHelper, result.normal);
+                            var sameXDirect = areaX != 1 && (areaX >> 1) == (targetTriangle.direct & 1);
+                            var sameYDirect = areaY != 1 && (areaY >> 1) == ((targetTriangle.direct >> 1) & 1);
+                            if (sameXDirect && sameYDirect) {
+                                if (areaX != 1 && areaY != 1) {
+                                    //The circle is corner of the square.
+                                    //Detect if any point of square is inside the circle.
+                                    var points = targetTriangle.points;
+                                    var point = points[((areaY >> 1) << 1) | (areaX >> 1)];
+                                    var pointHelper = new vector_1.Vector();
+                                    var circleRadiusSquare = circleRadius * circleRadius;
+                                    vector_1.Vector.subVectors(circleCenter, point, pointHelper);
+                                    if (pointHelper.manitudeSquare() < circleRadiusSquare) {
+                                        //The point is inside the circle.
+                                        result.collided = true;
+                                        vector_1.Vector.normalVector(pointHelper, result.normal);
+                                    }
+                                }
+                                else {
+                                    var points = targetTriangle.points;
+                                    //Right angle point.
+                                    var point = points[targetTriangle.direct];
+                                    if (areaX != 1) {
+                                        if (Math.abs(point.x - circleCenterPos[0]) < circleRadius) {
+                                            result.collided = true;
+                                            result.normal = new vector_1.Vector(areaX - 1, 0);
+                                        }
+                                    }
+                                    else {
+                                        if (Math.abs(point.y - circleCenterPos[1]) < circleRadius) {
+                                            result.collided = true;
+                                            result.normal = new vector_1.Vector(0, areaY);
+                                        }
+                                    }
                                 }
                             }
                             else {
-                                result.collided = true;
-                                result.normal = new vector_1.Vector(areaX - 1, areaY - 1);
+                                var vectorTriangleToCenter = vector_1.Vector.subVectors(myCircle.pos, targetTriangle.pos);
+                                var points = targetTriangle.points;
+                                //Right angle point.
+                                var point = points[targetTriangle.direct];
+                                var normal = vector_1.Vector.subVectors(targetTriangle.pos, point);
+                                normal.normal();
+                                var dot = vector_1.Vector.dotVectors(vectorTriangleToCenter, normal);
+                                var circleRadius_1 = myCircle.radius;
+                                if (dot < circleRadius_1) {
+                                    result.collided = true;
+                                    result.normal = normal;
+                                }
                             }
                             break;
                         }
@@ -350,54 +442,6 @@ var MyCircle = /** @class */ (function (_super) {
                     if (findArea)
                         break;
                 }
-                // if (circleCenterX > squareBounds.minX && circleCenterX < squareBounds.maxX) {
-                //     if (circleCenterY > squareBounds.minY && circleCenterY < squareBounds.maxY) {
-                //         //The center is inside the bounds (namely, inside the square).
-                //         result.collided = true;
-                //         Vector.normalVector(myCircle.velocity, result.normal);
-                //     } else if (circleCenterY > squareBounds.maxY) {
-                //         //The center is downside the bounds.
-                //         if (circleCenterY - squareBounds.maxY < circleRadius) {
-                //             result.collided = true;
-                //             result.normal = new Vector(0, 1);
-                //         }
-                //     } else if (circleCenterY < squareBounds.minY) {
-                //         //The center is upside the bounds.
-                //         if (squareBounds.minY - circleCenterY < circleRadius) {
-                //             result.collided = true;
-                //             result.normal = new Vector(0, -1);
-                //         }
-                //     }
-                // } else if (circleCenterY > squareBounds.minY && circleCenterY < squareBounds.maxY) {
-                //     if (circleCenterX > squareBounds.maxX) {
-                //         //The center is right of the bounds.
-                //         if (circleCenterX - squareBounds.maxX < circleRadius) {
-                //             result.collided = true;
-                //             result.normal = new Vector(1, 0);
-                //         }
-                //     } else if (circleCenterX < squareBounds.minX) {
-                //         //The center is left of the bounds.
-                //         if (squareBounds.minX - circleCenterX < circleRadius) {
-                //             result.collided = true;
-                //             result.normal = new Vector(-1, 0);
-                //         }
-                //     }
-                // } else {
-                //     //Detect if any point of square is inside the circle.
-                //     let points = targetSquare.points;
-                //     let pointCount = points.length;
-                //     let pointHelper:Vector = new Vector();
-                //     let circleRadiusSquare:number = circleRadius * circleRadius;
-                //     for (let i = 0; i < pointCount; ++i) {
-                //         Vector.subVectors(circleCenter, points[i], pointHelper);
-                //         if (pointHelper.manitudeSquare() < circleRadiusSquare) {
-                //             //The point is inside the circle.
-                //             result.collided = true;
-                //             Vector.normalVector(pointHelper, result.normal);
-                //             break;
-                //         }
-                //     }
-                // }
             }
         }
         else {
@@ -579,6 +623,126 @@ var Rectangle = /** @class */ (function (_super) {
     return Rectangle;
 }(object_1.Obj));
 exports.Rectangle = Rectangle;
+
+
+/***/ }),
+
+/***/ "./src/triangle.ts":
+/*!*************************!*\
+  !*** ./src/triangle.ts ***!
+  \*************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+var object_1 = __webpack_require__(/*! ./object */ "./src/object.ts");
+var vector_1 = __webpack_require__(/*! ./vector */ "./src/vector.ts");
+var rectangle_1 = __webpack_require__(/*! ./rectangle */ "./src/rectangle.ts");
+//Right angle direct.
+var DirectIRTriangle;
+(function (DirectIRTriangle) {
+    DirectIRTriangle[DirectIRTriangle["LEFT_UP"] = 0] = "LEFT_UP";
+    DirectIRTriangle[DirectIRTriangle["RIGHT_UP"] = 1] = "RIGHT_UP";
+    DirectIRTriangle[DirectIRTriangle["RIGHT_BOTTOM"] = 3] = "RIGHT_BOTTOM";
+    DirectIRTriangle[DirectIRTriangle["LEFT_BOTTOM"] = 2] = "LEFT_BOTTOM";
+})(DirectIRTriangle = exports.DirectIRTriangle || (exports.DirectIRTriangle = {}));
+var IRTriangle = /** @class */ (function (_super) {
+    __extends(IRTriangle, _super);
+    function IRTriangle() {
+        var _this = _super.call(this) || this;
+        _this._size = 0;
+        var points = [];
+        _this._points = points;
+        var POINT_COUNT = rectangle_1.Rectangle.POINT_COUNT;
+        points.length = POINT_COUNT;
+        for (var i = 0; i < POINT_COUNT; ++i) {
+            points[i] = new vector_1.Vector();
+        }
+        _this._setBounds();
+        _this._setPoints();
+        return _this;
+    }
+    Object.defineProperty(IRTriangle.prototype, "size", {
+        get: function () {
+            return this._size;
+        },
+        set: function (value) {
+            this._size = value;
+            this._setBounds();
+            this._setPoints();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IRTriangle.prototype, "pos", {
+        get: function () {
+            return this._pos;
+        },
+        set: function (value) {
+            var pos = this._pos;
+            pos.copy(value);
+            this._setBounds();
+            this._setPoints();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    IRTriangle.prototype.updatePos = function (value) {
+        _super.prototype.updatePos.call(this, value);
+        this._setBounds();
+        this._setPoints();
+    };
+    Object.defineProperty(IRTriangle.prototype, "points", {
+        get: function () {
+            return this._points;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    IRTriangle.prototype._setBounds = function () {
+        var pos = this._pos;
+        var bounds = this._bounds;
+        var halfSize = this._size / 2;
+        bounds.minX = pos.x - halfSize;
+        bounds.minY = pos.y - halfSize;
+        bounds.maxX = pos.x + halfSize;
+        bounds.maxY = pos.y + halfSize;
+    };
+    IRTriangle.prototype._setPoints = function () {
+        var bounds = this._bounds;
+        var points = this._points;
+        //0 is 0(y)0(x)
+        points[0].x = bounds.minX;
+        points[0].y = bounds.minY;
+        //1 is 0(y)1(x)
+        points[1].x = bounds.maxX;
+        points[1].y = bounds.minY;
+        //3 is 1(y)1(x)
+        points[3].x = bounds.maxX;
+        points[3].y = bounds.maxY;
+        //2 is 1(y)0(x)
+        points[2].x = bounds.minX;
+        points[2].y = bounds.maxY;
+    };
+    IRTriangle.POINT_COUNT = 4;
+    return IRTriangle;
+}(object_1.Obj));
+exports.IRTriangle = IRTriangle;
 
 
 /***/ }),
