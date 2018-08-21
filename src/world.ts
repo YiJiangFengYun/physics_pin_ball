@@ -99,6 +99,8 @@ export class World {
                 myBody.pos = cachePos;
                 //Set new velocity according to collision normal.
                 Vector.reflectVector(myBody.velocity, collsionNormal, reflectResult);
+                if (Math.abs(reflectResult.magnitude() - myBody.velocity.magnitude()) > 10) 
+                    throw new Error('Velocity changed');
                 myBody.velocity.copy(reflectResult);
 
                 //Move
