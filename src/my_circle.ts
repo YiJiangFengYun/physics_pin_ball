@@ -132,7 +132,7 @@ export class MyCircle extends Circle {
                 let findArea = false;
                 for (let areaX = 0; areaX < 3; ++areaX) {
                     for (let areaY = 0; areaY < 3; ++areaY) {
-                        if ((circlArea ^ areaX) == 0 && ((circlArea >> 2) ^ areaY) == 0) {
+                        if (((circlArea & 3) ^ areaX) == 0 && ((circlArea >> 2) ^ areaY) == 0) {
                             findArea = true;
                             let sameXDirect = areaX != 1 && (areaX >> 1) == (targetTriangle.direct & 1);
                             let sameYDirect = areaY != 1 && (areaY >> 1) == ((targetTriangle.direct >> 1) & 1);
