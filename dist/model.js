@@ -864,13 +864,13 @@ exports.Vector = Vector;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var vector_1 = __webpack_require__(/*! ./vector */ "./src/vector.ts");
-var my_circle_1 = __webpack_require__(/*! ./my_circle */ "./src/my_circle.ts");
 var World = /** @class */ (function () {
     function World() {
         this.time = 0;
         this.objectCount = 0;
         this.objects = [];
-        this.myObj = new my_circle_1.MyCircle();
+        this.myCircleCount = 0;
+        this.myCircles = [];
     }
     World.prototype.addObj = function (object) {
         if (this.objectCount < this.objects.length) {
@@ -896,16 +896,36 @@ var World = /** @class */ (function () {
             }
         }
     };
-    World.prototype.clear = function () {
+    World.prototype.clearObjs = function () {
         this.objectCount = 0;
     };
-    Object.defineProperty(World.prototype, "myObject", {
-        get: function () {
-            return this.myObj;
-        },
-        enumerable: true,
-        configurable: true
-    });
+    World.prototype.addMyCircle = function (myCircle) {
+        if (this.myCircleCount < this.myCircles.length) {
+            this.myCircles[this.myCircleCount++] = myCircle;
+        }
+        else {
+            this.myCircles.length = 2 * this.myCircles.length;
+            this.myCircles[this.myCircleCount++] = myCircle;
+        }
+    };
+    World.prototype.removeMyCircle = function (myCircle) {
+        var myCircleCount = this.myCircleCount;
+        var myCircles = this.myCircles;
+        for (var i = 0; i < myCircleCount; ++i) {
+            if (myCircle == myCircles[i]) {
+                --myCircleCount;
+                if (i < myCircleCount) {
+                    myCircles[i] = myCircles[myCircleCount];
+                    myCircles[myCircleCount] = null;
+                }
+                this.myCircleCount = myCircleCount;
+                return;
+            }
+        }
+    };
+    World.prototype.clearMyCircles = function () {
+        this.myCircleCount = 0;
+    };
     World.prototype.step = function (dt, iterations) {
         dt = dt || 0;
         iterations = iterations || 1;
@@ -916,49 +936,53 @@ var World = /** @class */ (function () {
         var reflectResultHelper = new vector_1.Vector();
         var minDt = dt / iterations;
         for (var iteration = 0; iteration < iterations; ++iteration) {
-            var objectCount = this.objectCount;
-            var objects = this.objects;
-            var myBody = this.myObj;
-            //Cache current position.
-            var cachePos = cachePosHelper;
-            cachePos.copy(myBody.pos);
-            //Caculate next position.
-            var nextPos = nextPosHelper;
-            nextPos.x = myBody.pos.x + myBody.velocity.x * minDt;
-            nextPos.y = myBody.pos.y + myBody.velocity.y * minDt;
-            myBody.pos = nextPos;
-            //Detect collision.
-            var collisioned = false;
-            var collisionResult = collisionResultHelper;
-            var collsionNormal = collisionNormlHelper;
-            collsionNormal.zero();
-            for (var i = 0; i < objectCount; ++i) {
-                var object = objects[i];
-                myBody.collide(object, collisionResult);
-                if (collisionResult.collided) {
-                    collisioned = true;
-                    collsionNormal.add(collisionResult.normal);
+            var myCircleCount = this.myCircleCount;
+            var myCircles = this.myCircles;
+            for (var myCircleIndex = 0; myCircleIndex < myCircleCount; ++myCircleIndex) {
+                var objectCount = this.objectCount;
+                var objects = this.objects;
+                var myBody = myCircles[myCircleIndex];
+                //Cache current position.
+                var cachePos = cachePosHelper;
+                cachePos.copy(myBody.pos);
+                //Caculate next position.
+                var nextPos = nextPosHelper;
+                nextPos.x = myBody.pos.x + myBody.velocity.x * minDt;
+                nextPos.y = myBody.pos.y + myBody.velocity.y * minDt;
+                myBody.pos = nextPos;
+                //Detect collision.
+                var collisioned = false;
+                var collisionResult = collisionResultHelper;
+                var collsionNormal = collisionNormlHelper;
+                collsionNormal.zero();
+                for (var i = 0; i < objectCount; ++i) {
+                    var object = objects[i];
+                    myBody.collide(object, collisionResult);
+                    if (collisionResult.collided) {
+                        collisioned = true;
+                        collsionNormal.add(collisionResult.normal);
+                    }
                 }
-            }
-            //Final collsion result.
-            var reflectResult = reflectResultHelper;
-            if (collisioned) {
-                //Recover to cached pre postion.
-                myBody.pos = cachePos;
-                var cacheMagnitude = myBody.velocity.magnitude();
-                //Set new velocity according to collision normal.
-                vector_1.Vector.reflectVector(myBody.velocity, collsionNormal, reflectResult);
-                // if (Math.abs(reflectResult.magnitude() - myBody.velocity.magnitude()) > 10) 
-                //     throw new Error('Velocity is changed!');
-                // myBody.velocity.copy(reflectResult);
-                reflectResult.normal();
-                reflectResult.mulMag(cacheMagnitude);
-                myBody.velocity.copy(reflectResult);
-                //Move
-                var nextPos_1 = nextPosHelper;
-                nextPos_1.x = myBody.pos.x + myBody.velocity.x * minDt;
-                nextPos_1.y = myBody.pos.y + myBody.velocity.y * minDt;
-                myBody.pos = nextPos_1;
+                //Final collsion result.
+                var reflectResult = reflectResultHelper;
+                if (collisioned) {
+                    //Recover to cached pre postion.
+                    myBody.pos = cachePos;
+                    var cacheMagnitude = myBody.velocity.magnitude();
+                    //Set new velocity according to collision normal.
+                    vector_1.Vector.reflectVector(myBody.velocity, collsionNormal, reflectResult);
+                    // if (Math.abs(reflectResult.magnitude() - myBody.velocity.magnitude()) > 10) 
+                    //     throw new Error('Velocity is changed!');
+                    // myBody.velocity.copy(reflectResult);
+                    reflectResult.normal();
+                    reflectResult.mulMag(cacheMagnitude);
+                    myBody.velocity.copy(reflectResult);
+                    //Move
+                    var nextPos_1 = nextPosHelper;
+                    nextPos_1.x = myBody.pos.x + myBody.velocity.x * minDt;
+                    nextPos_1.y = myBody.pos.y + myBody.velocity.y * minDt;
+                    myBody.pos = nextPos_1;
+                }
             }
         }
         this.time += dt;

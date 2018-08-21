@@ -7,13 +7,15 @@ export class World {
     time:number;
     objectCount:number;
     objects: Obj[];
-    myObj:MyCircle;
+    myCircleCount:number;
+    myCircles:MyCircle[];
 
     constructor() {
         this.time = 0;
         this.objectCount = 0;
         this.objects = [];
-        this.myObj = new MyCircle();
+        this.myCircleCount = 0;
+        this.myCircles = [];
     }
 
     addObj(object:Obj) {
@@ -43,12 +45,39 @@ export class World {
         }
     }
 
-    clear() {
+    clearObjs() {
         this.objectCount = 0;
     }
 
-    get myObject() {
-        return this.myObj;
+    addMyCircle(myCircle:MyCircle) {
+        if (this.myCircleCount < this.myCircles.length) {
+            this.myCircles[this.myCircleCount++] = myCircle;
+        }
+        else {
+            this.myCircles.length = 2 * this.myCircles.length;
+            this.myCircles[this.myCircleCount++] = myCircle;
+        }
+    }
+
+    removeMyCircle(myCircle:MyCircle) {
+        let myCircleCount = this.myCircleCount;
+        let myCircles = this.myCircles;
+        for (let i = 0; i < myCircleCount; ++i) {
+            if (myCircle == myCircles[i]) {
+                --myCircleCount;
+                if (i < myCircleCount) {
+                    myCircles[i] = myCircles[myCircleCount];
+                    myCircles[myCircleCount] = null;
+                }
+
+                this.myCircleCount = myCircleCount;
+                return;
+            }
+        }
+    }
+
+    clearMyCircles() {
+        this.myCircleCount = 0;
     }
 
     step(dt: number, iterations: number):void {
@@ -64,56 +93,63 @@ export class World {
 
         let minDt:number = dt / iterations;
         for (let iteration = 0; iteration < iterations; ++iteration) {
-            let objectCount = this.objectCount;
-            let objects = this.objects;
-            let myBody = this.myObj;
-
-            //Cache current position.
-            let cachePos = cachePosHelper;
-            cachePos.copy(myBody.pos);
-
-            //Caculate next position.
-            let nextPos = nextPosHelper;
-            nextPos.x = myBody.pos.x + myBody.velocity.x * minDt;
-            nextPos.y = myBody.pos.y + myBody.velocity.y * minDt;
-            myBody.pos = nextPos;
-
-            //Detect collision.
-            let collisioned = false;
-            let collisionResult = collisionResultHelper;
-            let collsionNormal = collisionNormlHelper;
-            collsionNormal.zero();
-            for (let i = 0; i < objectCount; ++i) {
-                let object = objects[i];
-                myBody.collide(object, collisionResult);
-                if (collisionResult.collided) {
-                    collisioned = true;
-                    collsionNormal.add(collisionResult.normal);
-                }
-            }
-
-            //Final collsion result.
-            let reflectResult = reflectResultHelper;
-            if (collisioned) {
-                //Recover to cached pre postion.
-                myBody.pos = cachePos;
-                let cacheMagnitude = myBody.velocity.magnitude();
-                //Set new velocity according to collision normal.
-                Vector.reflectVector(myBody.velocity, collsionNormal, reflectResult);
-                // if (Math.abs(reflectResult.magnitude() - myBody.velocity.magnitude()) > 10) 
-                //     throw new Error('Velocity is changed!');
-                // myBody.velocity.copy(reflectResult);
-
-                reflectResult.normal();
-                reflectResult.mulMag(cacheMagnitude);
-                myBody.velocity.copy(reflectResult);
-
-                //Move
+            let myCircleCount = this.myCircleCount;
+            let myCircles = this.myCircles;
+            for (let myCircleIndex = 0; myCircleIndex < myCircleCount; ++myCircleIndex) {
+                let objectCount = this.objectCount;
+                let objects = this.objects;
+                let myBody = myCircles[myCircleIndex];
+    
+                //Cache current position.
+                let cachePos = cachePosHelper;
+                cachePos.copy(myBody.pos);
+    
+                //Caculate next position.
                 let nextPos = nextPosHelper;
                 nextPos.x = myBody.pos.x + myBody.velocity.x * minDt;
                 nextPos.y = myBody.pos.y + myBody.velocity.y * minDt;
                 myBody.pos = nextPos;
+    
+                //Detect collision.
+                let collisioned = false;
+                let collisionResult = collisionResultHelper;
+                let collsionNormal = collisionNormlHelper;
+                collsionNormal.zero();
+                for (let i = 0; i < objectCount; ++i) {
+                    let object = objects[i];
+                    myBody.collide(object, collisionResult);
+                    if (collisionResult.collided) {
+                        collisioned = true;
+                        collsionNormal.add(collisionResult.normal);
+                    }
+                }
+    
+                //Final collsion result.
+                let reflectResult = reflectResultHelper;
+                if (collisioned) {
+                    //Recover to cached pre postion.
+                    myBody.pos = cachePos;
+                    let cacheMagnitude = myBody.velocity.magnitude();
+                    //Set new velocity according to collision normal.
+                    Vector.reflectVector(myBody.velocity, collsionNormal, reflectResult);
+
+                    // if (Math.abs(reflectResult.magnitude() - myBody.velocity.magnitude()) > 10) 
+                    //     throw new Error('Velocity is changed!');
+                    // myBody.velocity.copy(reflectResult);
+    
+                    reflectResult.normal();
+                    reflectResult.mulMag(cacheMagnitude);
+                    myBody.velocity.copy(reflectResult);
+    
+                    //Move
+                    let nextPos = nextPosHelper;
+                    nextPos.x = myBody.pos.x + myBody.velocity.x * minDt;
+                    nextPos.y = myBody.pos.y + myBody.velocity.y * minDt;
+                    myBody.pos = nextPos;
+                }
             }
+
+            
         }
 
         this.time += dt;
