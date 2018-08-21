@@ -162,7 +162,7 @@ export class MyCircle extends Circle {
                                     } else {
                                         if (Math.abs(point.y - circleCenterPos[1]) < circleRadius) {
                                             result.collided = true;
-                                            result.normal = new Vector(0, areaY);
+                                            result.normal = new Vector(0, areaY - 1);
                                         }
                                     }
                                 }

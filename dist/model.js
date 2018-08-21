@@ -417,7 +417,7 @@ var MyCircle = /** @class */ (function (_super) {
                                     else {
                                         if (Math.abs(point.y - circleCenterPos[1]) < circleRadius) {
                                             result.collided = true;
-                                            result.normal = new vector_1.Vector(0, areaY);
+                                            result.normal = new vector_1.Vector(0, areaY - 1);
                                         }
                                     }
                                 }
