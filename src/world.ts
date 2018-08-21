@@ -97,6 +97,7 @@ export class World {
             if (collisioned) {
                 //Recover to cached pre postion.
                 myBody.pos = cachePos;
+                let cacheMagnitude = myBody.velocity.magnitude();
                 //Set new velocity according to collision normal.
                 Vector.reflectVector(myBody.velocity, collsionNormal, reflectResult);
                 // if (Math.abs(reflectResult.magnitude() - myBody.velocity.magnitude()) > 10) 
@@ -104,7 +105,7 @@ export class World {
                 // myBody.velocity.copy(reflectResult);
 
                 reflectResult.normal();
-                reflectResult.mulMag(myBody.velocity.magnitude());
+                reflectResult.mulMag(cacheMagnitude);
                 myBody.velocity.copy(reflectResult);
 
                 //Move
