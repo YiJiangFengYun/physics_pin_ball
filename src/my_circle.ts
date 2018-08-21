@@ -136,7 +136,7 @@ export class MyCircle extends Circle {
                             findArea = true;
                             let sameXDirect = areaX != 1 && (areaX >> 1) == (targetTriangle.direct & 1);
                             let sameYDirect = areaY != 1 && (areaY >> 1) == ((targetTriangle.direct >> 1) & 1);
-                            if (sameXDirect && sameYDirect) {
+                            if (sameXDirect || sameYDirect) {
                                 if (areaX != 1 && areaY != 1) {
                                     //The circle is corner of the square.
                                     //Detect if any point of square is inside the circle.
