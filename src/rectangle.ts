@@ -78,13 +78,17 @@ export class Rectangle extends Obj {
     _setPoints() {
         let bounds = this._bounds;
         let points = this._points;
+        //0 is 0(y)0(x)
         points[0].x = bounds.minX;
         points[0].y = bounds.minY;
+        //1 is 0(y)1(x)
         points[1].x = bounds.maxX;
         points[1].y = bounds.minY;
-        points[2].x = bounds.maxX;
-        points[2].y = bounds.maxY;
-        points[3].x = bounds.minX;
+        //3 is 1(y)1(x)
+        points[3].x = bounds.maxX;
         points[3].y = bounds.maxY;
+        //2 is 1(y)0(x)
+        points[2].x = bounds.minX;
+        points[2].y = bounds.maxY;
     }
 }

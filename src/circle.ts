@@ -16,6 +16,7 @@ export class Circle extends Obj {
 
     set radius(value:number) {
         this._radius = value;
+        this._setBounds();
     }
 
     get pos() {
