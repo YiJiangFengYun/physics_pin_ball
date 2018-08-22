@@ -1,6 +1,7 @@
 import { Obj } from "./object";
 import { MyCircle } from "./my_circle";
-export declare class World {
+import * as eventemitter3 from "eventemitter3";
+export declare class World extends eventemitter3.EventEmitter {
     time: number;
     objectCount: number;
     objects: Obj[];
