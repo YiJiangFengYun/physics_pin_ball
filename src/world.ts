@@ -1,8 +1,9 @@
 import { Obj } from "./object";
 import { Vector } from "./vector";
 import { MyCircle, ICollideResult } from "./my_circle";
+import * as eventemitter3 from "eventemitter3";
 
-export class World {
+export class World extends eventemitter3.EventEmitter {
 
     time:number;
     objectCount:number;
@@ -11,6 +12,7 @@ export class World {
     myCircles:MyCircle[];
 
     constructor() {
+        super()
         this.time = 0;
         this.objectCount = 0;
         this.objects = [];
@@ -111,7 +113,7 @@ export class World {
                 myBody.pos = nextPos;
     
                 //Detect collision.
-                let collisioned = false;
+                let collided = false;
                 let collisionResult = collisionResultHelper;
                 let collsionNormal = collisionNormlHelper;
                 collsionNormal.zero();
@@ -119,14 +121,15 @@ export class World {
                     let object = objects[i];
                     myBody.collide(object, collisionResult);
                     if (collisionResult.collided) {
-                        collisioned = true;
+                        collided = true;
                         collsionNormal.add(collisionResult.normal);
+                        this.emit("collided", object);
                     }
                 }
     
                 //Final collsion result.
                 let reflectResult = reflectResultHelper;
-                if (collisioned) {
+                if (collided) {
                     //Recover to cached pre postion.
                     myBody.pos = cachePos;
                     let cacheMagnitude = myBody.velocity.magnitude();
@@ -146,6 +149,7 @@ export class World {
                     nextPos.x = myBody.pos.x + myBody.velocity.x * minDt;
                     nextPos.y = myBody.pos.y + myBody.velocity.y * minDt;
                     myBody.pos = nextPos;
+
                 }
             }
 
