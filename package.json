@@ -5,14 +5,12 @@
   "main": "./lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc && webpack"
+    "build": "tsc"
   },
   "author": "",
   "license": "ISC",
   "private": true,
   "devDependencies": {
-    "awesome-typescript-loader": "^5.2.0",
-    "source-map-loader": "^0.2.4",
     "typescript": "^3.0.1"
   },
   "files": [
