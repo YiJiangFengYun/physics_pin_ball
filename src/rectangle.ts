@@ -24,7 +24,7 @@ export class Rectangle extends Obj {
     }
 
     set size(value:Vector) {
-        this._size = value;
+        this._size.copy(value);
         this._setBounds();
         this._setPoints();
     }
