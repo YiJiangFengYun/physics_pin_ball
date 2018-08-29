@@ -14,8 +14,8 @@ export abstract class Obj {
     }
 
     set pos(value:Vector) {
-        if (value.x === NaN) throw new Error("Pos x is NaN.");
-        if (value.y === NaN) throw new Error("POs y is NaN.");
+        if (isNaN(value.x)) throw new Error("Pos x is NaN.");
+        if (isNaN(value.y)) throw new Error("POs y is NaN.");
         this._pos.copy(value);
     }
 
