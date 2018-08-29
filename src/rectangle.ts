@@ -2,14 +2,12 @@ import { Obj } from "./object";
 import { Vector } from "./vector";
 
 export class Rectangle extends Obj {
-    private _width:number;
-    private _height:number;
+    private _size:Vector;
     static POINT_COUNT:number = 4;
     private _points:Vector[];
     constructor() {
         super();
-        this._width = 0;
-        this._height = 0;
+        this._size = new Vector();
         let points:Vector[] = [];
         this._points = points;
         const POINT_COUNT = Rectangle.POINT_COUNT;
@@ -21,22 +19,12 @@ export class Rectangle extends Obj {
         this._setPoints();
     }
 
-    get width() {
-        return this._width;
+    get size() {
+        return this._size;
     }
 
-    set width(value:number) {
-        this._width = value;
-        this._setBounds();
-        this._setPoints();
-    }
-
-    get height() {
-        return this._height;
-    }
-
-    set height(value:number) {
-        this._height = value;
+    set size(value:Vector) {
+        this._size = value;
         this._setBounds();
         this._setPoints();
     }
@@ -66,9 +54,10 @@ export class Rectangle extends Obj {
 
     _setBounds() {
         let pos = this._pos;
+        let size = this._size;
         let bounds = this._bounds;
-        let halfWidth = this._width / 2;
-        let halfHeight = this._height / 2;
+        let halfWidth = size.x / 2;
+        let halfHeight = size.y / 2;
         bounds.minX = pos.x - halfWidth;
         bounds.minY = pos.y - halfHeight;
         bounds.maxX = pos.x + halfWidth;
