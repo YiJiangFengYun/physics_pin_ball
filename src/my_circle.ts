@@ -25,7 +25,7 @@ export class MyCircle extends Circle {
     set velocity(value:Vector) {
         if (value.x === NaN) throw new Error("Velocity x is NaN.");
         if (value.y === NaN) throw new Error("Velocity y is NaN.");
-        this._velocity = value;
+        this._velocity.copy(value);
     }
 
     collide(target:Obj, result?:ICollideResult) {
