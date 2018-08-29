@@ -4,37 +4,37 @@ import { Vector } from "./vector";
 
 export class Circle extends Obj {
     private _radius:number;
-    constructor() {
+    public constructor() {
         super();
         this._radius = 0;
         this._setBounds();
     }
 
-    get radius():number {
+    public get radius():number {
         return this._radius;
     }
 
-    set radius(value:number) {
+    public set radius(value:number) {
         this._radius = value;
         this._setBounds();
     }
 
-    get pos() {
+    public get pos() {
         return this._pos;
     }
 
-    set pos(value:Vector) {
+    public set pos(value:Vector) {
         var pos = this._pos;
         pos.copy(value);
         this._setBounds();
     }
 
-    updatePos(value?:Vector) {
+    public updatePos(value?:Vector) {
         super.updatePos(value);
         this._setBounds();
     }
 
-    _setBounds() {
+    private _setBounds() {
         let pos = this._pos;
         var bounds = this._bounds;
         var radius = this._radius;
