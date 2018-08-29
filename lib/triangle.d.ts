@@ -1,10 +1,10 @@
 import { Obj } from "./object";
 import { Vector } from "./vector";
 export declare enum DirectIRTriangle {
-    LEFT_UP = 0,
-    RIGHT_UP = 1,
-    RIGHT_BOTTOM = 3,
-    LEFT_BOTTOM = 2
+    NEG_NEG = 0,
+    POS_NEG = 1,
+    POS_POS = 3,
+    NEG_POS = 2
 }
 export declare class IRTriangle extends Obj {
     direct: DirectIRTriangle;
