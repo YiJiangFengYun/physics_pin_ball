@@ -142,7 +142,7 @@ export class World extends eventemitter3.EventEmitter {
     
                     reflectResult.normal();
                     reflectResult.mulMag(cacheMagnitude);
-                    myBody.velocity.copy(reflectResult);
+                    myBody.velocity = reflectResult;
     
                     //Move
                     let nextPos = nextPosHelper;
