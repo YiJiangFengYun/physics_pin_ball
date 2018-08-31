@@ -37,9 +37,14 @@ export class Vector {
             throw new Error("The result shouldn't be argument vec.");
         }
         let dot = Vector.dotVectors(vec, normal);
-        result.copy(normal);
-        result.mulMag(dot * 2);
-        Vector.subVectors(vec, result, result);
+        if (dot < 0) {
+            result.copy(normal);
+            result.mulMag(dot * 2);
+            Vector.subVectors(vec, result, result);
+        } else {
+            result.copy(normal);
+            result.mulMag(vec.magnitude());
+        }
         return result;
     }
 
