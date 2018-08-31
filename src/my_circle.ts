@@ -97,8 +97,7 @@ export class MyCircle extends Circle {
                     let pointHelper:Vector = new Vector();
                     let circleRadiusSquare:number = circleRadius * circleRadius;
                     for (let i = 0; i < pointCount; ++i) {
-                        // Vector.subVectors(circleCenter, points[i], pointHelper);
-                        Vector.subVectors(points[i], targetSquare.pos, pointHelper);
+                        Vector.subVectors(circleCenter, points[i], pointHelper);
                         if (pointHelper.manitudeSquare() < circleRadiusSquare) {
                             //The point is inside the circle.
                             result.collided = true;
@@ -147,8 +146,7 @@ export class MyCircle extends Circle {
                                     let point = points[((areaY >> 1) << 1) | (areaX >> 1)];
                                     let pointHelper = new Vector();
                                     let circleRadiusSquare:number = circleRadius * circleRadius;
-                                    // Vector.subVectors(circleCenter, point, pointHelper);
-                                    Vector.subVectors(point, targetTriangle.pos, pointHelper);
+                                    Vector.subVectors(circleCenter, point, pointHelper);
                                     if (pointHelper.manitudeSquare() < circleRadiusSquare) {
                                         //The point is inside the circle.
                                         result.collided = true;
