@@ -101,6 +101,7 @@ export class World extends eventemitter3.EventEmitter {
                 let objectCount = this.objectCount;
                 let objects = this.objects;
                 let myBody = myCircles[myCircleIndex];
+                if (! myBody.valid) continue;
     
                 //Cache current position.
                 let cachePos = cachePosHelper;
@@ -119,6 +120,7 @@ export class World extends eventemitter3.EventEmitter {
                 collsionNormal.zero();
                 for (let i = 0; i < objectCount; ++i) {
                     let object = objects[i];
+                    if ( ! object.valid) continue;
                     myBody.collide(object, collisionResult);
                     if (collisionResult.collided) {
                         collided = true;

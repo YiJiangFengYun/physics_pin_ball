@@ -2,11 +2,13 @@ import { Vector } from "./vector";
 import { Bounds } from "./bounds";
 
 export abstract class Obj {
+    public valid:Boolean;
     protected _pos:Vector;
     protected _bounds:Bounds;
     constructor() {
         this._pos = new Vector();
         this._bounds = new Bounds();
+        this.valid = true;
     }
 
     get pos():Vector {
