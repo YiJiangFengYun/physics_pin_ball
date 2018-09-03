@@ -123,7 +123,7 @@ export class World extends eventemitter3.EventEmitter {
                     if (collisionResult.collided) {
                         collided = true;
                         collsionNormal.add(collisionResult.normal);
-                        this.emit("collided", object);
+                        this.emit("collided", object, myBody);
                     }
                 }
     
