@@ -1,9 +1,9 @@
 import { Obj } from "./object";
 import { Vector } from "./vector";
 import { MyCircle, ICollideResult } from "./my_circle";
-import * as eventemitter3 from "eventemitter3";
+import * as EventEmitter from "eventemitter3";
 
-export class World extends eventemitter3.EventEmitter {
+export class World extends EventEmitter {
 
     time:number;
     objectCount:number;
