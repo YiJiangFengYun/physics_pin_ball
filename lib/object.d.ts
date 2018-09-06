@@ -1,6 +1,7 @@
 import { Vector } from "./vector";
 import { Bounds } from "./bounds";
-export declare abstract class Obj {
+import * as EventEmitter from "eventemitter3";
+export declare abstract class Obj extends EventEmitter {
     valid: Boolean;
     protected _pos: Vector;
     protected _bounds: Bounds;

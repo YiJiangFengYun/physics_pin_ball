@@ -1,11 +1,13 @@
 import { Vector } from "./vector";
 import { Bounds } from "./bounds";
+import * as EventEmitter from "eventemitter3";
 
-export abstract class Obj {
+export abstract class Obj extends EventEmitter {
     public valid:Boolean;
     protected _pos:Vector;
     protected _bounds:Bounds;
     constructor() {
+        super();
         this._pos = new Vector();
         this._bounds = new Bounds();
         this.valid = true;

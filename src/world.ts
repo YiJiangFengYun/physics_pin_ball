@@ -126,6 +126,8 @@ export class World extends EventEmitter {
                         collided = true;
                         collsionNormal.add(collisionResult.normal);
                         this.emit("collided", object, myBody);
+                        object.emit("collided", myBody);
+                        myBody.emit("collided", object);
                     }
                 }
     
