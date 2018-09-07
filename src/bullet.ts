@@ -8,7 +8,7 @@ export interface ICollideResult {
     collided: boolean; normal:Vector;
 }
 
-export class MyCircle extends Circle {
+export class Bullet extends Circle {
 
     private _velocity:Vector;
 
@@ -37,31 +37,31 @@ export class MyCircle extends Circle {
             result.collided = false;
         }
         if (target instanceof Circle) {
-            let myCircle = this;
+            let bullet = this;
             let targetCircle = target as Circle;
-            if (myCircle.bounds.intersect(targetCircle.bounds)) {
-                let normal = Vector.subVectors(myCircle.pos, targetCircle.pos);
+            if (bullet.bounds.intersect(targetCircle.bounds)) {
+                let normal = Vector.subVectors(bullet.pos, targetCircle.pos);
                 let distance = normal.magnitude();
-                if (distance < (myCircle.radius + targetCircle.radius)) {
+                if (distance < (bullet.radius + targetCircle.radius)) {
                     result.collided = true;
                     normal.normal();
                     result.normal.copy(normal);
                 }
             }
         } else if (target instanceof Rectangle) {
-            let myCircle = this;
+            let bullet = this;
             let targetSquare = target as Rectangle;
-            if (myCircle.bounds.intersect(targetSquare.bounds)) {
-                let circleCenter = myCircle.pos;
+            if (bullet.bounds.intersect(targetSquare.bounds)) {
+                let circleCenter = bullet.pos;
                 let circleCenterX = circleCenter.x;
                 let circleCenterY = circleCenter.y;
-                let circleRadius = myCircle.radius;
+                let circleRadius = bullet.radius;
                 let squareBounds = targetSquare.bounds;
                 if (circleCenterX > squareBounds.minX && circleCenterX < squareBounds.maxX) {
                     if (circleCenterY > squareBounds.minY && circleCenterY < squareBounds.maxY) {
                         //The center is inside the bounds (namely, inside the square).
                         result.collided = true;
-                        Vector.normalVector(myCircle.velocity, result.normal);
+                        Vector.normalVector(bullet.velocity, result.normal);
                     } else if (circleCenterY > squareBounds.maxY) {
                         //The center is downside the bounds.
                         if (circleCenterY - squareBounds.maxY < circleRadius) {
@@ -108,12 +108,12 @@ export class MyCircle extends Circle {
                 }
             }
         } else if (target instanceof IRTriangle) {
-            let myCircle = this;
+            let bullet = this;
             let targetTriangle = target as IRTriangle;
-            if (myCircle.bounds.intersect(targetTriangle.bounds)) {
-                let circleCenter = myCircle.pos;
+            if (bullet.bounds.intersect(targetTriangle.bounds)) {
+                let circleCenter = bullet.pos;
                 let circleCenterPos = [circleCenter.x, circleCenter.y];
-                let circleRadius = myCircle.radius;
+                let circleRadius = bullet.radius;
                 let triangleBounds = targetTriangle.bounds;
                 let triangleBoundsMin = [triangleBounds.minX, triangleBounds.minY];
                 let triangleBoundsMax = [triangleBounds.maxX, triangleBounds.maxY];
@@ -169,14 +169,14 @@ export class MyCircle extends Circle {
                                     }
                                 }
                             } else {
-                                let vectorTriangleToCenter = Vector.subVectors(myCircle.pos, targetTriangle.pos);
+                                let vectorTriangleToCenter = Vector.subVectors(bullet.pos, targetTriangle.pos);
                                 let points = targetTriangle.points;
                                     //Right angle point.
                                 let point = points[targetTriangle.direct];
                                 let normal = Vector.subVectors(targetTriangle.pos, point);
                                 normal.normal();
                                 let dot = Vector.dotVectors(vectorTriangleToCenter, normal);
-                                let circleRadius = myCircle.radius;
+                                let circleRadius = bullet.radius;
                                 if (dot < circleRadius) {
                                     result.collided = true;
                                     result.normal = normal;

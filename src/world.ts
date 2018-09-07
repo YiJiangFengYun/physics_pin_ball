@@ -1,6 +1,6 @@
 import { Obj } from "./object";
 import { Vector } from "./vector";
-import { MyCircle, ICollideResult } from "./my_circle";
+import { Bullet, ICollideResult } from "./bullet";
 import * as EventEmitter from "eventemitter3";
 
 export class World extends EventEmitter {
@@ -8,16 +8,16 @@ export class World extends EventEmitter {
     time:number;
     objectCount:number;
     objects: Obj[];
-    myCircleCount:number;
-    myCircles:MyCircle[];
+    bulletCount:number;
+    bullets:Bullet[];
 
     constructor() {
         super()
         this.time = 0;
         this.objectCount = 0;
         this.objects = [];
-        this.myCircleCount = 0;
-        this.myCircles = [];
+        this.bulletCount = 0;
+        this.bullets = [];
     }
 
     addObj(object:Obj) {
@@ -51,35 +51,35 @@ export class World extends EventEmitter {
         this.objectCount = 0;
     }
 
-    addMyCircle(myCircle:MyCircle) {
-        if (this.myCircleCount < this.myCircles.length) {
-            this.myCircles[this.myCircleCount++] = myCircle;
+    addbullet(bullet:Bullet) {
+        if (this.bulletCount < this.bullets.length) {
+            this.bullets[this.bulletCount++] = bullet;
         }
         else {
-            this.myCircles.length = 2 * this.myCircles.length;
-            this.myCircles[this.myCircleCount++] = myCircle;
+            this.bullets.length = 2 * this.bullets.length;
+            this.bullets[this.bulletCount++] = bullet;
         }
     }
 
-    removeMyCircle(myCircle:MyCircle) {
-        let myCircleCount = this.myCircleCount;
-        let myCircles = this.myCircles;
-        for (let i = 0; i < myCircleCount; ++i) {
-            if (myCircle == myCircles[i]) {
-                --myCircleCount;
-                if (i < myCircleCount) {
-                    myCircles[i] = myCircles[myCircleCount];
-                    myCircles[myCircleCount] = null;
+    removebullet(bullet:Bullet) {
+        let bulletCount = this.bulletCount;
+        let bullets = this.bullets;
+        for (let i = 0; i < bulletCount; ++i) {
+            if (bullet == bullets[i]) {
+                --bulletCount;
+                if (i < bulletCount) {
+                    bullets[i] = bullets[bulletCount];
+                    bullets[bulletCount] = null;
                 }
 
-                this.myCircleCount = myCircleCount;
+                this.bulletCount = bulletCount;
                 return;
             }
         }
     }
 
-    clearMyCircles() {
-        this.myCircleCount = 0;
+    clearbullets() {
+        this.bulletCount = 0;
     }
 
     step(dt: number, iterations: number):void {
@@ -95,12 +95,12 @@ export class World extends EventEmitter {
 
         let minDt:number = dt / iterations;
         for (let iteration = 0; iteration < iterations; ++iteration) {
-            let myCircleCount = this.myCircleCount;
-            let myCircles = this.myCircles;
-            for (let myCircleIndex = 0; myCircleIndex < myCircleCount; ++myCircleIndex) {
+            let bulletCount = this.bulletCount;
+            let bullets = this.bullets;
+            for (let bulletIndex = 0; bulletIndex < bulletCount; ++bulletIndex) {
                 let objectCount = this.objectCount;
                 let objects = this.objects;
-                let myBody = myCircles[myCircleIndex];
+                let myBody = bullets[bulletIndex];
                 if (! myBody.valid) continue;
     
                 //Cache current position.
