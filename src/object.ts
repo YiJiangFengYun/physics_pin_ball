@@ -4,6 +4,7 @@ import * as EventEmitter from "eventemitter3";
 
 export abstract class Obj extends EventEmitter {
     public valid:Boolean;
+    public reflexible:boolean;
     public userData:any;
     protected _pos:Vector;
     protected _bounds:Bounds;

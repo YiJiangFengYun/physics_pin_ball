@@ -89,7 +89,7 @@ export class World extends EventEmitter {
 
         let cachePosHelper:Vector = new Vector();
         let nextPosHelper:Vector = new Vector();
-        let collisionResultHelper:ICollideResult = { collided:false, normal: new Vector()};
+        let collisionResultHelper:ICollideResult = { collided:false, relected:false, normal: new Vector()};
         let collisionNormlHelper:Vector = new Vector();
         let reflectResultHelper:Vector = new Vector();
 
@@ -124,7 +124,7 @@ export class World extends EventEmitter {
                     myBody.collide(object, collisionResult);
                     if (collisionResult.collided) {
                         collided = true;
-                        collsionNormal.add(collisionResult.normal);
+                        if (collisionResult.relected) collsionNormal.add(collisionResult.normal);
                         this.emit("collided", object, myBody);
                         object.emit("collided", myBody);
                         myBody.emit("collided", object);
@@ -132,8 +132,8 @@ export class World extends EventEmitter {
                 }
     
                 //Final collsion result.
-                let reflectResult = reflectResultHelper;
-                if (collided) {
+                if (collided && collsionNormal.isZero() == false) {
+                    let reflectResult = reflectResultHelper;
                     //Recover to cached pre postion.
                     myBody.pos = cachePos;
                     let cacheMagnitude = myBody.velocity.magnitude();

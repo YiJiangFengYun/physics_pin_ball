@@ -3,6 +3,7 @@ import { Bounds } from "./bounds";
 import * as EventEmitter from "eventemitter3";
 export declare abstract class Obj extends EventEmitter {
     valid: Boolean;
+    reflexible: boolean;
     userData: any;
     protected _pos: Vector;
     protected _bounds: Bounds;

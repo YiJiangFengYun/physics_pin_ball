@@ -3,6 +3,7 @@ import { Obj } from "./object";
 import { Vector } from "./vector";
 export interface ICollideResult {
     collided: boolean;
+    relected: boolean;
     normal: Vector;
 }
 export declare class Bullet extends Circle {
