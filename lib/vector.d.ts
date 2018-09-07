@@ -17,4 +17,5 @@ export declare class Vector {
     manitudeSquare(): number;
     normal(): void;
     zero(): void;
+    isZero(): boolean;
 }

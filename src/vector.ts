@@ -101,4 +101,8 @@ export class Vector {
         this.x = 0;
         this.y = 0;
     }
+
+    isZero():boolean {
+        return this.x == 0 && this.y == 0;
+    }
 }
