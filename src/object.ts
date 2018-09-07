@@ -13,6 +13,7 @@ export abstract class Obj extends EventEmitter {
         this._pos = new Vector();
         this._bounds = new Bounds();
         this.valid = true;
+        this.reflexible = true;
     }
 
     get pos():Vector {
