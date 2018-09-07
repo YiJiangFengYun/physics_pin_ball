@@ -51,7 +51,7 @@ export class World extends EventEmitter {
         this.objectCount = 0;
     }
 
-    addbullet(bullet:Bullet) {
+    addBullet(bullet:Bullet) {
         if (this.bulletCount < this.bullets.length) {
             this.bullets[this.bulletCount++] = bullet;
         }
@@ -61,7 +61,7 @@ export class World extends EventEmitter {
         }
     }
 
-    removebullet(bullet:Bullet) {
+    removeBullet(bullet:Bullet) {
         let bulletCount = this.bulletCount;
         let bullets = this.bullets;
         for (let i = 0; i < bulletCount; ++i) {
@@ -78,7 +78,7 @@ export class World extends EventEmitter {
         }
     }
 
-    clearbullets() {
+    clearBullets() {
         this.bulletCount = 0;
     }
 

@@ -11,8 +11,8 @@ export declare class World extends EventEmitter {
     addObj(object: Obj): void;
     removeObj(object: Obj): void;
     clearObjs(): void;
-    addbullet(bullet: Bullet): void;
-    removebullet(bullet: Bullet): void;
-    clearbullets(): void;
+    addBullet(bullet: Bullet): void;
+    removeBullet(bullet: Bullet): void;
+    clearBullets(): void;
     step(dt: number, iterations: number): void;
 }
