@@ -11,6 +11,8 @@ export class World extends EventEmitter {
     bulletCount:number;
     bullets:Bullet[];
 
+    collectionMap:{[idsKey:string]: boolean};
+
     constructor() {
         super()
         this.time = 0;
@@ -18,6 +20,8 @@ export class World extends EventEmitter {
         this.objects = [];
         this.bulletCount = 0;
         this.bullets = [];
+
+        this.collectionMap = {};
     }
 
     addObj(object:Obj) {
@@ -100,18 +104,18 @@ export class World extends EventEmitter {
             for (let bulletIndex = 0; bulletIndex < bulletCount; ++bulletIndex) {
                 let objectCount = this.objectCount;
                 let objects = this.objects;
-                let myBody = bullets[bulletIndex];
-                if (! myBody.valid) continue;
+                let bullet = bullets[bulletIndex];
+                if (! bullet.valid) continue;
     
                 //Cache current position.
                 let cachePos = cachePosHelper;
-                cachePos.copy(myBody.pos);
+                cachePos.copy(bullet.pos);
     
                 //Caculate next position.
                 let nextPos = nextPosHelper;
-                nextPos.x = myBody.pos.x + myBody.velocity.x * minDt;
-                nextPos.y = myBody.pos.y + myBody.velocity.y * minDt;
-                myBody.pos = nextPos;
+                nextPos.x = bullet.pos.x + bullet.velocity.x * minDt;
+                nextPos.y = bullet.pos.y + bullet.velocity.y * minDt;
+                bullet.pos = nextPos;
     
                 //Detect collision.
                 let collided = false;
@@ -121,24 +125,45 @@ export class World extends EventEmitter {
                 for (let i = 0; i < objectCount; ++i) {
                     let object = objects[i];
                     if ( ! object.valid) continue;
-                    myBody.collide(object, collisionResult);
+                    let objCollided = false;
+                    bullet.collide(object, collisionResult);
                     if (collisionResult.collided) {
                         collided = true;
+                        objCollided = true;
                         if (collisionResult.relected) collsionNormal.add(collisionResult.normal);
-                        this.emit("collided", object, myBody);
-                        object.emit("collided", myBody);
-                        myBody.emit("collided", object);
+                    }
+
+                    let preObjCollided = this.collectionMap[bullet.id + "_" + object.id] || false;
+                    this.collectionMap[bullet.id + "_" + object.id] = objCollided;
+
+                    if (collisionResult.relected && preObjCollided == false && objCollided == true) {
+                        this.emit("collision_begin", bullet, object);
+                        object.emit("collision_begin", bullet);
+                        bullet.emit("collision_begin", object);
+                    } 
+                    
+                    if (objCollided) {
+                        this.emit("collided", bullet, object);
+                        object.emit("collided", bullet);
+                        bullet.emit("collided", object);
+                    }
+                    
+                    if (collisionResult.relected && preObjCollided == true && objCollided == false) {
+                        this.emit("collsion_end", bullet, object);
+                        object.emit("collsion_end", bullet);
+                        bullet.emit("collsion_end", object);
                     }
                 }
+
     
                 //Final collsion result.
                 if (collided && collsionNormal.isZero() == false) {
                     let reflectResult = reflectResultHelper;
                     //Recover to cached pre postion.
-                    myBody.pos = cachePos;
-                    let cacheMagnitude = myBody.velocity.magnitude();
+                    bullet.pos = cachePos;
+                    let cacheMagnitude = bullet.velocity.magnitude();
                     //Set new velocity according to collision normal.
-                    Vector.reflectVector(myBody.velocity, collsionNormal, reflectResult);
+                    Vector.reflectVector(bullet.velocity, collsionNormal, reflectResult);
 
                     // if (Math.abs(reflectResult.magnitude() - myBody.velocity.magnitude()) > 10) 
                     //     throw new Error('Velocity is changed!');
@@ -146,13 +171,13 @@ export class World extends EventEmitter {
     
                     reflectResult.normal();
                     reflectResult.mulMag(cacheMagnitude);
-                    myBody.velocity = reflectResult;
+                    bullet.velocity = reflectResult;
     
                     //Move
                     let nextPos = nextPosHelper;
-                    nextPos.x = myBody.pos.x + myBody.velocity.x * minDt;
-                    nextPos.y = myBody.pos.y + myBody.velocity.y * minDt;
-                    myBody.pos = nextPos;
+                    nextPos.x = bullet.pos.x + bullet.velocity.x * minDt;
+                    nextPos.y = bullet.pos.y + bullet.velocity.y * minDt;
+                    bullet.pos = nextPos;
 
                 }
             }

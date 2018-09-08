@@ -7,6 +7,9 @@ export declare class World extends EventEmitter {
     objects: Obj[];
     bulletCount: number;
     bullets: Bullet[];
+    collectionMap: {
+        [idsKey: string]: boolean;
+    };
     constructor();
     addObj(object: Obj): void;
     removeObj(object: Obj): void;

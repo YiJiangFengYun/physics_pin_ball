@@ -3,17 +3,21 @@ import { Bounds } from "./bounds";
 import * as EventEmitter from "eventemitter3";
 
 export abstract class Obj extends EventEmitter {
-    public valid:Boolean;
-    public reflexible:boolean;
-    public userData:any;
-    protected _pos:Vector;
-    protected _bounds:Bounds;
+    public valid:Boolean = true;
+    public reflexible:boolean = true;
+    public userData:any = null;
+    protected _pos:Vector = new Vector();
+    protected _bounds:Bounds = new Bounds();
+
+    private static createdIdCount = 0;
+    private _id:number = 0;
     constructor() {
         super();
-        this._pos = new Vector();
-        this._bounds = new Bounds();
-        this.valid = true;
-        this.reflexible = true;
+        this._id = ++Obj.createdIdCount;
+    }
+
+    public get id() {
+        return this._id;
     }
 
     get pos():Vector {
