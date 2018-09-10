@@ -136,7 +136,7 @@ export class World extends EventEmitter {
                     let preObjCollided = this.collectionMap[bullet.id + "_" + object.id] || false;
                     this.collectionMap[bullet.id + "_" + object.id] = objCollided;
 
-                    if (collisionResult.relected && preObjCollided == false && objCollided == true) {
+                    if ( ! collisionResult.relected && preObjCollided == false && objCollided == true) {
                         this.emit("collision_begin", bullet, object);
                         object.emit("collision_begin", bullet);
                         bullet.emit("collision_begin", object);
@@ -148,7 +148,7 @@ export class World extends EventEmitter {
                         bullet.emit("collided", object);
                     }
                     
-                    if (collisionResult.relected && preObjCollided == true && objCollided == false) {
+                    if ( ! collisionResult.relected && preObjCollided == true && objCollided == false) {
                         this.emit("collsion_end", bullet, object);
                         object.emit("collsion_end", bullet);
                         bullet.emit("collsion_end", object);
