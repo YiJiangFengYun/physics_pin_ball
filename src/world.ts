@@ -1,7 +1,8 @@
 import { Obj } from "./object";
 import { Vector } from "./vector";
-import { Bullet, ICollideResult } from "./bullet";
+import { Bullet } from "./bullet";
 import * as EventEmitter from "eventemitter3";
+import { Collision, ICollideResult } from "./collision";
 
 export class World extends EventEmitter {
 
@@ -13,6 +14,8 @@ export class World extends EventEmitter {
 
     collectionMap:{[idsKey:string]: boolean};
 
+    collision:Collision;
+
     constructor() {
         super()
         this.time = 0;
@@ -22,6 +25,8 @@ export class World extends EventEmitter {
         this.bullets = [];
 
         this.collectionMap = {};
+
+        this.collision = new Collision();
     }
 
     addObj(object:Obj) {
@@ -126,7 +131,7 @@ export class World extends EventEmitter {
                     let object = objects[i];
                     if ( ! object.valid) continue;
                     let objCollided = false;
-                    bullet.collide(object, collisionResult);
+                    this.collision.collide(bullet, object, collisionResult);
                     if (collisionResult.collided) {
                         collided = true;
                         objCollided = true;

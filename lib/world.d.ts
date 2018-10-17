@@ -1,6 +1,7 @@
 import { Obj } from "./object";
 import { Bullet } from "./bullet";
 import * as EventEmitter from "eventemitter3";
+import { Collision } from "./collision";
 export declare class World extends EventEmitter {
     time: number;
     objectCount: number;
@@ -10,6 +11,7 @@ export declare class World extends EventEmitter {
     collectionMap: {
         [idsKey: string]: boolean;
     };
+    collision: Collision;
     constructor();
     addObj(object: Obj): void;
     removeObj(object: Obj): void;
