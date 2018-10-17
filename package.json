@@ -11,6 +11,8 @@
   "license": "ISC",
   "private": true,
   "devDependencies": {
+    "express": "^4.16.4",
+    "pixi.js": "^4.8.2",
     "typescript": "^3.0.1"
   },
   "files": [
