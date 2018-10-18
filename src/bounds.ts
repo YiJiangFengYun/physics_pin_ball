@@ -1,3 +1,5 @@
+import { Vector } from "./vector";
+
 export class Bounds {
     public static intersectBounds(bounds1:Bounds, bounds2:Bounds):boolean {
         if (bounds1.minX > bounds2.maxX || bounds1.maxX < bounds2.minX || 
@@ -21,5 +23,12 @@ export class Bounds {
 
     intersect(target:Bounds):boolean {
         return Bounds.intersectBounds(this, target);
+    }
+
+    copyFromOffset(target:Bounds, offset:Vector) {
+        this.minX = target.minX + offset.x;
+        this.minY = target.minY + offset.y;
+        this.maxX = target.maxX + offset.x;
+        this.maxY = target.maxY + offset.y;
     }
 }

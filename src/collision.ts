@@ -4,6 +4,7 @@ import { Circle } from "./circle";
 import { Rectangle } from "./rectangle";
 import { Bullet } from "./bullet";
 import { IRTriangle } from "./triangle";
+import { Rhombus } from "./rhombus";
 
 export interface ICollideResult {
     collided: boolean; 
@@ -19,6 +20,7 @@ export class Collision {
     public collisionCircle:CollisionCircle = new CollisionCircle();
     public collisionRectangle:CollisionRectangle = new CollisionRectangle();
     public collisionIRTriangle:CollisionIRTriangle = new CollisionIRTriangle();
+    public collisionRhombus:CollisionRhombus = new CollisionRhombus();
     public collide(bullet:Bullet, target:Obj, result?:ICollideResult) {
         let reflexible = bullet.reflexible && target.reflexible;
         if (result == null) result = {
@@ -38,6 +40,8 @@ export class Collision {
             this.collisionRectangle.collide(bullet, target, result);
         } else if (target instanceof IRTriangle) {
             this.collisionIRTriangle.collide(bullet, target, result);
+        } else if (target instanceof Rhombus) {
+            this.collisionRhombus.collide(bullet, target, result);
         } else {
             throw new Error("Invalid shape for collision detection.");
         }
@@ -214,5 +218,71 @@ export class CollisionIRTriangle implements ICollision {
             }
         }
         return;
+    }
+}
+
+export class CollisionRhombus implements ICollision {
+    public static COS_SIN_45:number = Math.sqrt(2) / 2;
+    public collide(bullet:Bullet, target:Obj, result?:ICollideResult):ICollideResult {
+        let reflexible = bullet.reflexible && target.reflexible;
+        let targetRhombus = target as Rhombus;
+        if (bullet.bounds.intersect(targetRhombus.bounds)) {
+            let circleCenter = bullet.pos;
+            let circleCenterX = circleCenter.x;
+            let circleCenterY = circleCenter.y;
+            let circleRadius = bullet.radius;
+            let cosSin45 = CollisionRhombus.COS_SIN_45;
+            let circleCenterXRelateTarget = circleCenterX - target.pos.x;
+            let circleCenterYRelateTarget = circleCenterY - target.pos.y;
+            let circleCenterXRotate = (circleCenterXRelateTarget + circleCenterYRelateTarget) * cosSin45;
+            let circleCenterYRotate = ( - circleCenterXRelateTarget + circleCenterYRelateTarget) * cosSin45;
+            let halfMinSize = targetRhombus.size * cosSin45;
+            if (circleCenterXRotate > - halfMinSize && circleCenterXRotate < halfMinSize) {
+                if (circleCenterYRotate > - halfMinSize && circleCenterYRotate < halfMinSize) {
+                    //The center is inside the bounds (namely, inside the square).
+                    result.collided = true;
+                    if (reflexible)Vector.normalVector(bullet.velocity, result.normal);
+                } else if (circleCenterYRotate > halfMinSize) {
+                    if (circleCenterYRotate - halfMinSize < circleRadius) {
+                        result.collided = true;
+                        if (reflexible)result.normal = new Vector(-cosSin45, cosSin45);
+                    }
+                } else if (circleCenterYRotate < - halfMinSize) {
+                    if (- halfMinSize - circleCenterYRotate < circleRadius) {
+                        result.collided = true;
+                        if (reflexible)result.normal = new Vector(cosSin45, - cosSin45);
+                    }
+                }
+            } else if (circleCenterYRotate > - halfMinSize && circleCenterYRotate < halfMinSize) {
+                if (circleCenterXRotate > halfMinSize) {
+                    if (circleCenterXRotate - halfMinSize < circleRadius) {
+                        result.collided = true;
+                        if (reflexible)result.normal = new Vector(cosSin45, cosSin45);
+                    }
+                } else if (circleCenterXRotate < - halfMinSize) {
+                    if (- halfMinSize - circleCenterXRotate < circleRadius) {
+                        result.collided = true;
+                        if (reflexible)result.normal = new Vector(- cosSin45, - cosSin45);
+                    }
+                }
+            } else {
+                //Detect if any point of square is inside the circle.
+                let points = targetRhombus.points;
+                let pointCount = points.length;
+                let pointHelper:Vector = new Vector();
+                let circleRadiusSquare:number = circleRadius * circleRadius;
+                for (let i = 0; i < pointCount; ++i) {
+                    Vector.subVectors(circleCenter, points[i], pointHelper);
+                    if (pointHelper.manitudeSquare() < circleRadiusSquare) {
+                        //The point is inside the circle.
+                        result.collided = true;
+                        if (reflexible)Vector.normalVector(pointHelper, result.normal);
+                        break;
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 }
