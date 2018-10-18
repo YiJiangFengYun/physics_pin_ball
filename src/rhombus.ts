@@ -71,65 +71,9 @@ export class Rhombus extends Obj {
         points[0].y = pos.y
         points[1].x = pos.x;
         points[1].y = pos.y - halfSize;
-        points[3].x = pos.x + halfSize;
-        points[3].y = pos.y;
-        points[2].x = pos.x;
-        points[2].y = pos.y + halfSize;
+        points[2].x = pos.x + halfSize;
+        points[2].y = pos.y;
+        points[3].x = pos.x;
+        points[3].y = pos.y + halfSize;
     }
-    // private _size:number = 0;
-    // private _rectangle:Rectangle = new Rectangle();
-    // private _angle:number = Math.PI / 2;
-    // private _rhombusToRectangle:number = Math.sqrt(2) / 2;
-    // constructor() {
-    //     super();
-    //     this._setBounds();
-    //     this._setRectangle();
-    // }
-
-    // get size() {
-    //     return this._size;
-    // }
-
-    // set size(size:number) {
-    //     this._size = size;
-    //     this._setBounds();
-    //     this._setRectangle();
-    // }
-
-    // get pos() {
-    //     return this._pos;
-    // }
-
-    // set pos(value:Vector) {
-    //     var pos = this._pos;
-    //     pos.copy(value);
-    //     this._setBounds();
-    //     this._setRectangle();
-    // }
-
-    // updatePos(value?:Vector) {
-    //     super.updatePos(value);
-    //     this._setBounds();
-    //     this._setRectangle();
-    // }
-
-    // _setBounds() {
-    //     let pos = this._pos;
-    //     let size = this._size;
-    //     let bounds = this._bounds;
-    //     let halfSize = size / 2;
-
-    //     bounds.minX = pos.x - halfSize;
-    //     bounds.minY = pos.y - halfSize;
-    //     bounds.maxX = pos.x + halfSize;
-    //     bounds.maxY = pos.y + halfSize;
-    // }
-
-    // _setRectangle() {
-    //     let pos
-    //     let rectangle = this._rectangle;
-    //     let size = this._size;
-    //     let rectangleSize = size * this._rhombusToRectangle;
-    //     rectangle.size = new Vector(rectangleSize, rectangleSize);
-    // }
 }
