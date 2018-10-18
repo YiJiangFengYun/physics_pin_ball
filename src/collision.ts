@@ -236,7 +236,7 @@ export class CollisionRhombus implements ICollision {
             let circleCenterYRelateTarget = circleCenterY - target.pos.y;
             let circleCenterXRotate = (circleCenterXRelateTarget + circleCenterYRelateTarget) * cosSin45;
             let circleCenterYRotate = ( - circleCenterXRelateTarget + circleCenterYRelateTarget) * cosSin45;
-            let halfMinSize = targetRhombus.size * cosSin45;
+            let halfMinSize = targetRhombus.size * cosSin45 / 2;
             if (circleCenterXRotate > - halfMinSize && circleCenterXRotate < halfMinSize) {
                 if (circleCenterYRotate > - halfMinSize && circleCenterYRotate < halfMinSize) {
                     //The center is inside the bounds (namely, inside the square).
