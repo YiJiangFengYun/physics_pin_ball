@@ -14,4 +14,5 @@ export declare abstract class Obj extends EventEmitter {
     pos: Vector;
     readonly bounds: Bounds;
     updatePos(value?: Vector): void;
+    protected _emitChangePos(): void;
 }

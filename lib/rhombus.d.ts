@@ -6,7 +6,6 @@ export declare class Rhombus extends Obj {
     private _points;
     constructor();
     size: number;
-    pos: Vector;
     updatePos(value?: Vector): void;
     readonly points: Vector[];
     _setBounds(): void;

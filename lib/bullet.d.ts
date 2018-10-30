@@ -4,4 +4,5 @@ export declare class Bullet extends Circle {
     private _velocity;
     constructor();
     velocity: Vector;
+    protected _emitChangePos(): void;
 }

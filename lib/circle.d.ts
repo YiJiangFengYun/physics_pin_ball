@@ -4,7 +4,6 @@ export declare class Circle extends Obj {
     private _radius;
     constructor();
     radius: number;
-    pos: Vector;
     updatePos(value?: Vector): void;
     private _setBounds;
 }

@@ -6,7 +6,6 @@ export declare class Rectangle extends Obj {
     private _points;
     constructor();
     size: Vector;
-    pos: Vector;
     updatePos(value?: Vector): void;
     readonly points: Vector[];
     _setBounds(): void;
