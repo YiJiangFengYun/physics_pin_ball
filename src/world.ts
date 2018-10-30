@@ -233,7 +233,7 @@ export class World extends EventEmitter {
                 for (let i = 0; i < borderCount; ++i) {
                     let border = borders[i];
                     if ( ! border || ! border.valid) continue;
-                    collided = this._collideObj(bullet, border, collisionResult, collisionNormal);
+                    collided = this._collideObj(bullet, border, collisionResult, collisionNormal) || collided;
                 }
 
                 ////item
@@ -244,7 +244,7 @@ export class World extends EventEmitter {
                     for (let col = itemspace.startCol; col <= itemspace.endCol; ++col) {
                         let item = items[row][col];
                         if (! item || ! item.valid) continue;
-                        collided = this._collideObj(bullet, item, collisionResult, collisionNormal);
+                        collided = this._collideObj(bullet, item, collisionResult, collisionNormal) || collided;
                     }
                 }
 
@@ -255,7 +255,7 @@ export class World extends EventEmitter {
                 for (let i = 0; i < objectCount; ++i) {
                     let object = objects[i];
                     if ( ! object.valid) continue;
-                    collided = this._collideObj(bullet, object, collisionResult, collisionNormal);
+                    collided = this._collideObj(bullet, object, collisionResult, collisionNormal) || collided;
                 }
     
                 //Final collsion result.
