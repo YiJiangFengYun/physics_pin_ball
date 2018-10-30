@@ -329,8 +329,8 @@ export class World extends EventEmitter {
         let startY = this.startY;
         let itemWidth = this.itemWidth;
         let itemHeight = this.itemHeight;
-        let rowCount = this.itemRowCount;
-        let colCount = this.itemColCount;
+        let rowCount = this.itemRowCount - 1;
+        let colCount = this.itemColCount - 1;
         let startCol = Math.round((bounds.minX - startX) / itemWidth);
         let endCol = Math.round((bounds.maxX - startX) / itemWidth);
         let startRow = Math.round((bounds.minY - startY) / itemHeight);
