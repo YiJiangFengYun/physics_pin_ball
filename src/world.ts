@@ -225,6 +225,15 @@ export class World extends EventEmitter {
                 let collisionNormal = collisionNormlHelper;
                 collisionNormal.zero();
 
+                ///border
+                let borders = this.borders;
+                let borderCount = borders.length;
+                for (let i = 0; i < borderCount; ++i) {
+                    let border = borders[i];
+                    if ( ! border || ! border.valid) continue;
+                    collided = this._collideObj(bullet, border, collisionResult, collisionNormal);
+                }
+
                 ////item
                 let items = this.items;
                 let itemspace = itemSpaceHelper;
