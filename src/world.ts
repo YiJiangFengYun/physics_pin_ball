@@ -4,60 +4,111 @@ import { Bullet } from "./bullet";
 import * as EventEmitter from "eventemitter3";
 import { Collision, ICollideResult } from "./collision";
 
-export class World extends EventEmitter {
+export interface IItemSpace  {
+    startRow:number; 
+    endRow:number; 
+    startCol:number; 
+    endCol:number;
+}
 
+export class World extends EventEmitter {
+    static BORDER_COUNT = 4;
+    width:number;
+    height:number;
+    startX:number;
+    startY:number;
     time:number;
-    objectCount:number;
-    objects: Obj[];
+    
     bulletCount:number;
     bullets:Bullet[];
+
+    borders:Obj[];
+
+    itemRowCount:number;
+    itemColCount:number;
+    itemWidth:number;
+    itemHeight:number;
+    items:Obj[][];
+
+    objectCount:number;
+    objects: Obj[];
 
     collectionMap:{[idsKey:string]: boolean};
 
     collision:Collision;
 
-    constructor() {
-        super()
+    constructor(
+        info: {
+            width:number;
+            height:number;
+            itemRowCount:number; 
+            itemColCount:number;
+        }
+    ) {
+        super();
+        this.width = info.width;
+        this.height = info.height;
+        this.startX = info.width / 2;
+        this.startY = info.height / 2;
         this.time = 0;
-        this.objectCount = 0;
-        this.objects = [];
         this.bulletCount = 0;
         this.bullets = [];
+
+        this.borders = [];
+        this.borders.length = World.BORDER_COUNT;
+
+        this.itemRowCount = info.itemRowCount;
+        this.itemColCount = info.itemColCount;
+        this.itemWidth = info.width / info.itemColCount;
+        this.itemHeight = info.height / info.itemRowCount;
+
+        let items:Obj[][] = [];
+        this.items = items;
+        this.items.length = info.itemRowCount;
+        for (let i = 0; i < info.itemRowCount; ++i) {
+            items[i] = [];
+            items[i].length = info.itemColCount;
+        }
+
+        this.objectCount = 0;
+        this.objects = [];
 
         this.collectionMap = {};
 
         this.collision = new Collision();
     }
 
-    addObj(object:Obj) {
-        if (this.objectCount < this.objects.length) {
-            this.objects[this.objectCount++] = object;
+    addBorder(border:Obj, index:number) {
+        if (index >= World.BORDER_COUNT) throw new Error("Index of the border is out of range of " + World.BORDER_COUNT);
+        if (this.borders[index]) {
+            console.warn("The border at the index has exist!");
+            this.removeBorder(index);
         }
-        else {
-            this.objects.length = 2 * this.objects.length;
-            this.objects[this.objectCount++] = object;
+        this.borders[index] = border;
+    }
+
+    removeBorder(borderOrIndex:Obj | number) {
+        let index = borderOrIndex instanceof Obj ? this.borders.indexOf(borderOrIndex as Obj) : borderOrIndex;
+        if (index >= 0) {
+            this.borders[index] = null;
         }
     }
 
-    removeObj(object:Obj) {
-        let objectCount = this.objectCount;
-        let objects = this.objects;
-        for (let i = 0; i < objectCount; ++i) {
-            if (object == objects[i]) {
-                --objectCount;
-                if (i < objectCount) {
-                    objects[i] = objects[objectCount];
-                    objects[objectCount] = null;
-                }
-
-                this.objectCount = objectCount;
-                return;
-            }
+    addItem(item:Obj, row:number = 0, col:number = 0) {
+        if (row >= this.itemRowCount) throw new Error("Row of the item is out of range of row count " + this.itemRowCount);
+        if (col >= this.itemColCount) throw new Error("Col of the item is out of range of col count " + this.itemColCount);
+        let items = this.items;
+        if (items[row][col]) {
+            console.warn("The items[" + row + "][" + col + "] has exist!");
+            this.removeItem(row, col);
         }
+        items[row][col] = item;
+        item.on("change_pos", this._onChangeItemPos, this);
     }
 
-    clearObjs() {
-        this.objectCount = 0;
+    removeItem(row:number, col:number) {
+        if (this.items[row][col])this.items[row][col].off("change_pos", this._onChangeItemPos, this);
+        this.items[row][col] = null;
     }
 
     addBullet(bullet:Bullet) {
@@ -91,6 +142,37 @@ export class World extends EventEmitter {
         this.bulletCount = 0;
     }
 
+    addObj(object:Obj) {
+        if (this.objectCount < this.objects.length) {
+            this.objects[this.objectCount++] = object;
+        }
+        else {
+            this.objects.length = 2 * this.objects.length;
+            this.objects[this.objectCount++] = object;
+        }
+    }
+
+    removeObj(object:Obj) {
+        let objectCount = this.objectCount;
+        let objects = this.objects;
+        for (let i = 0; i < objectCount; ++i) {
+            if (object == objects[i]) {
+                --objectCount;
+                if (i < objectCount) {
+                    objects[i] = objects[objectCount];
+                    objects[objectCount] = null;
+                }
+
+                this.objectCount = objectCount;
+                return;
+            }
+        }
+    }
+
+    clearObjs() {
+        this.objectCount = 0;
+    }
+
     step(dt: number, iterations: number):void {
 
         dt = dt || 0;
@@ -101,14 +183,13 @@ export class World extends EventEmitter {
         let collisionResultHelper:ICollideResult = { collided:false, relected:false, normal: new Vector()};
         let collisionNormlHelper:Vector = new Vector();
         let reflectResultHelper:Vector = new Vector();
+        let itemSpaceHelper:IItemSpace = {} as IItemSpace;
 
         let minDt:number = dt / iterations;
         for (let iteration = 0; iteration < iterations; ++iteration) {
             let bulletCount = this.bulletCount;
             let bullets = this.bullets;
             for (let bulletIndex = 0; bulletIndex < bulletCount; ++bulletIndex) {
-                let objectCount = this.objectCount;
-                let objects = this.objects;
                 let bullet = bullets[bulletIndex];
                 if (! bullet.valid) continue;
     
@@ -125,50 +206,39 @@ export class World extends EventEmitter {
                 //Detect collision.
                 let collided = false;
                 let collisionResult = collisionResultHelper;
-                let collsionNormal = collisionNormlHelper;
-                collsionNormal.zero();
-                for (let i = 0; i < objectCount; ++i) {
-                    let object = objects[i];
-                    if ( ! object.valid) continue;
-                    let objCollided = false;
-                    this.collision.collide(bullet, object, collisionResult);
-                    if (collisionResult.collided) {
-                        collided = true;
-                        objCollided = true;
-                        if (collisionResult.relected) collsionNormal.add(collisionResult.normal);
-                    }
+                let collisionNormal = collisionNormlHelper;
+                collisionNormal.zero();
 
-                    let preObjCollided = this.collectionMap[bullet.id + "_" + object.id] || false;
-                    this.collectionMap[bullet.id + "_" + object.id] = objCollided;
-
-                    if ( ! collisionResult.relected && preObjCollided == false && objCollided == true) {
-                        this.emit("collision_begin", bullet, object);
-                        object.emit("collision_begin", bullet);
-                        bullet.emit("collision_begin", object);
-                    } 
-                    
-                    if (objCollided) {
-                        this.emit("collided", bullet, object);
-                        object.emit("collided", bullet);
-                        bullet.emit("collided", object);
-                    }
-                    
-                    if ( ! collisionResult.relected && preObjCollided == true && objCollided == false) {
-                        this.emit("collsion_end", bullet, object);
-                        object.emit("collsion_end", bullet);
-                        bullet.emit("collsion_end", object);
+                ////item
+                let items = this.items;
+                let itemspace = itemSpaceHelper;
+                this._getBulletCoverItemSpaces(bullet, itemspace);
+                for (let row = itemspace.startRow; row <= itemspace.endRow; ++row) {
+                    for (let col = itemspace.startCol; col <= itemspace.endCol; ++col) {
+                        let item = items[row][col];
+                        if (! item || ! item.valid) continue;
+                        collided = this._collideObj(bullet, item, collisionResult, collisionNormal);
                     }
                 }
 
+
+                ////obj
+                let objectCount = this.objectCount;
+                let objects = this.objects;
+                for (let i = 0; i < objectCount; ++i) {
+                    let object = objects[i];
+                    if ( ! object.valid) continue;
+                    collided = this._collideObj(bullet, object, collisionResult, collisionNormal);
+                }
     
                 //Final collsion result.
-                if (collided && collsionNormal.isZero() == false) {
+                if (collided && collisionNormal.isZero() == false) {
                     let reflectResult = reflectResultHelper;
                     //Recover to cached pre postion.
                     bullet.pos = cachePos;
                     let cacheMagnitude = bullet.velocity.magnitude();
                     //Set new velocity according to collision normal.
-                    Vector.reflectVector(bullet.velocity, collsionNormal, reflectResult);
+                    Vector.reflectVector(bullet.velocity, collisionNormal, reflectResult);
 
                     // if (Math.abs(reflectResult.magnitude() - myBody.velocity.magnitude()) > 10) 
                     //     throw new Error('Velocity is changed!');
@@ -191,5 +261,58 @@ export class World extends EventEmitter {
         }
 
         this.time += dt;
+    }
+
+    private _collideObj(bullet:Bullet, object:Obj, collisionResult:ICollideResult, collsionNormal:Vector):boolean {
+        let collided = false;
+        let objCollided = false;
+        this.collision.collide(bullet, object, collisionResult);
+        if (collisionResult.collided) {
+            collided = true;
+            objCollided = true;
+            if (collisionResult.relected) collsionNormal.add(collisionResult.normal);
+        }
+        
+        let preObjCollided = this.collectionMap[bullet.id + "_" + object.id] || false;
+        this.collectionMap[bullet.id + "_" + object.id] = objCollided
+        if ( ! collisionResult.relected && preObjCollided == false && objCollided == true) {
+            this.emit("collision_begin", bullet, object);
+            object.emit("collision_begin", bullet);
+            bullet.emit("collision_begin", object);
+        } 
+        
+        if (objCollided) {
+            this.emit("collided", bullet, object);
+            object.emit("collided", bullet);
+            bullet.emit("collided", object);
+        }
+        
+        if ( ! collisionResult.relected && preObjCollided == true && objCollided == false) {
+            this.emit("collsion_end", bullet, object);
+            object.emit("collsion_end", bullet);
+            bullet.emit("collsion_end", object);
+        }
+
+        return collided;
+    }
+
+    private _getBulletCoverItemSpaces(bullet:Bullet, result?:IItemSpace):void {
+        let bounds = bullet.bounds;
+        let startX = this.startX;
+        let startY = this.startY;
+        let itemWidth = this.itemWidth;
+        let itemHeight = this.itemHeight;
+        let startCol = Math.round((bounds.minX - startX) / itemWidth);
+        let endCol = Math.round((bounds.maxX - startX) / itemWidth);
+        let startRow = Math.round((bounds.minY - startY) / itemHeight);
+        let endRow = Math.round((bounds.maxY - startY) / itemHeight);
+        result.startCol = startCol;
+        result.endCol = endCol;
+        result.startRow = startRow;
+        result.endRow = endRow;
+    }
+
+    private _onChangeItemPos() {
+        console.error("It changed item pos.");
     }
 }

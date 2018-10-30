@@ -25,5 +25,8 @@ export class Bullet extends Circle {
         this._velocity.copy(value);
     }
 
+    protected _emitChangePos() {
+    }
+
     
 }

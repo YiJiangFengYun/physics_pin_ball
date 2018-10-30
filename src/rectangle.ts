@@ -29,19 +29,6 @@ export class Rectangle extends Obj {
         this._setPoints();
     }
 
-    get pos() {
-        return this._pos;
-    }
-
-    set pos(value:Vector) {
-        var pos = this._pos;
-        pos.copy(value);
-        
-        this._setBounds();
-        this._setPoints();
-        
-    }
-
     updatePos(value?:Vector) {
         super.updatePos(value);
         this._setBounds();

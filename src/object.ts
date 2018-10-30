@@ -11,7 +11,7 @@ export abstract class Obj extends EventEmitter {
 
     private static createdIdCount = 0;
     private _id:number = 0;
-    constructor() {
+    public constructor() {
         super();
         this._id = ++Obj.createdIdCount;
     }
@@ -20,23 +20,31 @@ export abstract class Obj extends EventEmitter {
         return this._id;
     }
 
-    get pos():Vector {
+    public get pos():Vector {
         return this._pos;
     }
 
-    set pos(value:Vector) {
-        if (isNaN(value.x)) throw new Error("Pos x is NaN.");
-        if (isNaN(value.y)) throw new Error("POs y is NaN.");
-        this._pos.copy(value);
+    public set pos(value:Vector) {
+        this.updatePos(value);
     }
 
-    get bounds():Bounds {
+    public get bounds():Bounds {
         return this._bounds;
     }
 
-    updatePos(value?:Vector) {
+    public updatePos(value?:Vector) {
         if (value) {
-            this._pos = value;
+            if (isNaN(value.x)) throw new Error("Pos x is NaN.");
+            if (isNaN(value.y)) throw new Error("POs y is NaN.");
+            this._pos.copy(value);
+            this._emitChangePos();
         }
     }
+
+    protected _emitChangePos() {
+        this.emit("change_pos");
+    }
+
+
+
 }

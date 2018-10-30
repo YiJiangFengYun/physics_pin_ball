@@ -19,16 +19,6 @@ export class Circle extends Obj {
         this._setBounds();
     }
 
-    public get pos() {
-        return this._pos;
-    }
-
-    public set pos(value:Vector) {
-        var pos = this._pos;
-        pos.copy(value);
-        this._setBounds();
-    }
-
     public updatePos(value?:Vector) {
         super.updatePos(value);
         this._setBounds();
