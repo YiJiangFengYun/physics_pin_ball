@@ -49,8 +49,8 @@ export class World extends EventEmitter {
         super();
         this.width = info.width;
         this.height = info.height;
-        this.startX = info.width / 2;
-        this.startY = info.height / 2;
+        this.startX = - info.width / 2;
+        this.startY = - info.height / 2;
         this.time = 0;
         this.bulletCount = 0;
         this.bullets = [];
