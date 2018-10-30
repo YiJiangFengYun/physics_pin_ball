@@ -111,7 +111,7 @@ export class World extends EventEmitter {
         this.items[row][col] = null;
     }
 
-    clearItem() {
+    clearItems() {
         let rowCount = this.itemRowCount;
         let colCount = this.itemColCount;
         let items = this.items;
