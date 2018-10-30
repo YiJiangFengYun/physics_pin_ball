@@ -327,14 +327,16 @@ export class World extends EventEmitter {
         let startY = this.startY;
         let itemWidth = this.itemWidth;
         let itemHeight = this.itemHeight;
+        let rowCount = this.itemRowCount;
+        let colCount = this.itemColCount;
         let startCol = Math.round((bounds.minX - startX) / itemWidth);
         let endCol = Math.round((bounds.maxX - startX) / itemWidth);
         let startRow = Math.round((bounds.minY - startY) / itemHeight);
         let endRow = Math.round((bounds.maxY - startY) / itemHeight);
-        result.startCol = startCol;
-        result.endCol = endCol;
-        result.startRow = startRow;
-        result.endRow = endRow;
+        result.startCol = Math.max(0, Math.min(colCount, startCol));
+        result.endCol = Math.max(0, Math.min(colCount, endCol));
+        result.startRow = Math.max(0, Math.min(rowCount, startRow));
+        result.endRow = Math.max(0, Math.min(rowCount, endRow));
     }
 
     private _onChangeItemPos() {
