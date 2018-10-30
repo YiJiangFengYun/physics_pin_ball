@@ -111,6 +111,17 @@ export class World extends EventEmitter {
         this.items[row][col] = null;
     }
 
+    clearItem() {
+        let rowCount = this.itemRowCount;
+        let colCount = this.itemColCount;
+        let items = this.items;
+        for (let i = 0; i < rowCount; ++i) {
+            for (let j = 0; j < colCount; ++j) {
+                items[i][j] = null;
+            }
+        }
+    }
+
     addBullet(bullet:Bullet) {
         if (this.bulletCount < this.bullets.length) {
             this.bullets[this.bulletCount++] = bullet;

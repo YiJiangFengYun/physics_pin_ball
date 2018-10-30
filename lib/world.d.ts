@@ -39,6 +39,7 @@ export declare class World extends EventEmitter {
     removeBorder(borderOrIndex: Obj | number): void;
     addItem(item: Obj, row?: number, col?: number): void;
     removeItem(row: number, col: number): void;
+    clearItem(): void;
     addBullet(bullet: Bullet): void;
     removeBullet(bullet: Bullet): void;
     clearBullets(): void;
