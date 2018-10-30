@@ -13,6 +13,7 @@ export interface IItemSpace  {
 
 export class World extends EventEmitter {
     static BORDER_COUNT = 4;
+    static vectorHelper = new Vector();
     width:number;
     height:number;
     startX:number;
@@ -103,6 +104,10 @@ export class World extends EventEmitter {
             this.removeItem(row, col);
         }
         items[row][col] = item;
+        let pos = World.vectorHelper;
+        pos.x = this.startX + this.itemWidth / 2 * (col + 1);
+        pos.y = this.startY + this.itemHeight / 2 * (row + 1);
+        item.updatePos(pos);
         item.on("change_pos", this._onChangeItemPos, this);
     }
 

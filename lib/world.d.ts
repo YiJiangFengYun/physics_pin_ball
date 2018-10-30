@@ -1,4 +1,5 @@
 import { Obj } from "./object";
+import { Vector } from "./vector";
 import { Bullet } from "./bullet";
 import * as EventEmitter from "eventemitter3";
 import { Collision } from "./collision";
@@ -10,6 +11,7 @@ export interface IItemSpace {
 }
 export declare class World extends EventEmitter {
     static BORDER_COUNT: number;
+    static vectorHelper: Vector;
     width: number;
     height: number;
     startX: number;
