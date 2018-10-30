@@ -105,8 +105,10 @@ export class World extends EventEmitter {
         }
         items[row][col] = item;
         let pos = World.vectorHelper;
-        pos.x = this.startX + this.itemWidth / 2 * (col + 1);
-        pos.y = this.startY + this.itemHeight / 2 * (row + 1);
+        let itemWidth = this.itemWidth;
+        let itemHeight = this.itemHeight;
+        pos.x = this.startX + itemWidth / 2 +  itemWidth * col;
+        pos.y = this.startY + itemHeight / 2 * itemHeight * row;
         item.updatePos(pos);
         item.on("change_pos", this._onChangeItemPos, this);
     }
