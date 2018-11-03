@@ -3,6 +3,7 @@ import { Vector } from "./vector";
 import { Bullet } from "./bullet";
 import * as EventEmitter from "eventemitter3";
 import { Collision, ICollideResult } from "./collision";
+import { Event } from "./event";
 
 export interface IItemSpace  {
     startRow:number; 
@@ -191,9 +192,24 @@ export class World extends EventEmitter {
         this.objectCount = 0;
     }
 
+    /**
+     * Step physics with passed time and iteration count duration the passed time.
+     * @param dt Passed time of this step.
+     * @param iterations Iteration count of this step.
+     */
     step(dt: number, iterations: number):void {
+        this.step2(dt / iterations, iterations);
+    }
 
-        dt = dt || 0;
+    /**
+     * Step physics with iteration count and passed time for a iteration.
+     * @param dtPerIte Passed time for a iteration.
+     * @param iterations Iteration count.
+     */
+    step2(dtPerIte:number, iterations:number) {
+        if (! dtPerIte) return;
+        if (! iterations) return;
+
         iterations = iterations || 1;
 
         let cachePosHelper:Vector = new Vector();
@@ -203,8 +219,9 @@ export class World extends EventEmitter {
         let reflectResultHelper:Vector = new Vector();
         let itemSpaceHelper:IItemSpace = {} as IItemSpace;
 
-        let minDt:number = dt / iterations;
         for (let iteration = 0; iteration < iterations; ++iteration) {
+            this.emit(Event.PRE_FORWARD);
+
             let bulletCount = this.bulletCount;
             let bullets = this.bullets;
             for (let bulletIndex = 0; bulletIndex < bulletCount; ++bulletIndex) {
@@ -217,8 +234,8 @@ export class World extends EventEmitter {
     
                 //Caculate next position.
                 let nextPos = nextPosHelper;
-                nextPos.x = bullet.pos.x + bullet.velocity.x * minDt;
-                nextPos.y = bullet.pos.y + bullet.velocity.y * minDt;
+                nextPos.x = bullet.pos.x + bullet.velocity.x * dtPerIte;
+                nextPos.y = bullet.pos.y + bullet.velocity.y * dtPerIte;
                 bullet.pos = nextPos;
     
                 //Detect collision.
@@ -277,17 +294,17 @@ export class World extends EventEmitter {
     
                     //Move
                     let nextPos = nextPosHelper;
-                    nextPos.x = bullet.pos.x + bullet.velocity.x * minDt;
-                    nextPos.y = bullet.pos.y + bullet.velocity.y * minDt;
+                    nextPos.x = bullet.pos.x + bullet.velocity.x * dtPerIte;
+                    nextPos.y = bullet.pos.y + bullet.velocity.y * dtPerIte;
                     bullet.pos = nextPos;
 
                 }
             }
 
-            
+            this.emit(Event.POST_FORWARD);
         }
 
-        this.time += dt;
+        this.time += dtPerIte * iterations;
     }
 
     private _collideObj(bullet:Bullet, object:Obj, collisionResult:ICollideResult, collsionNormal:Vector):boolean {
@@ -303,21 +320,21 @@ export class World extends EventEmitter {
         let preObjCollided = this.collectionMap[bullet.id + "_" + object.id] || false;
         this.collectionMap[bullet.id + "_" + object.id] = objCollided
         if ( ! collisionResult.relected && preObjCollided == false && objCollided == true) {
-            this.emit("collision_begin", bullet, object);
-            object.emit("collision_begin", bullet);
-            bullet.emit("collision_begin", object);
+            this.emit(Event.COLLISION_BEGIN, bullet, object);
+            object.emit(Event.COLLISION_BEGIN, bullet);
+            bullet.emit(Event.COLLISION_BEGIN, object);
         } 
         
         if (objCollided) {
-            this.emit("collided", bullet, object);
-            object.emit("collided", bullet);
-            bullet.emit("collided", object);
+            this.emit(Event.COLLIDED, bullet, object);
+            object.emit(Event.COLLIDED, bullet);
+            bullet.emit(Event.COLLIDED, object);
         }
         
         if ( ! collisionResult.relected && preObjCollided == true && objCollided == false) {
-            this.emit("collsion_end", bullet, object);
-            object.emit("collsion_end", bullet);
-            bullet.emit("collsion_end", object);
+            this.emit(Event.COLLISION_END, bullet, object);
+            object.emit(Event.COLLISION_END, bullet);
+            bullet.emit(Event.COLLISION_END, object);
         }
 
         return collided;

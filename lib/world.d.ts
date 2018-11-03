@@ -48,7 +48,18 @@ export declare class World extends EventEmitter {
     addObj(object: Obj): void;
     removeObj(object: Obj): void;
     clearObjs(): void;
+    /**
+     * Step physics with passed time and iteration count duration the passed time.
+     * @param dt Passed time of this step.
+     * @param iterations Iteration count of this step.
+     */
     step(dt: number, iterations: number): void;
+    /**
+     * Step physics with iteration count and passed time for a iteration.
+     * @param dtPerIte Passed time for a iteration.
+     * @param iterations Iteration count.
+     */
+    step2(dtPerIte: number, iterations: number): void;
     private _collideObj;
     private _getBulletCoverItemSpaces;
     private _onChangeItemPos;
