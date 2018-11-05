@@ -7,3 +7,4 @@ export * from "./triangle";
 export * from "./rhombus";
 export * from "./world";
 export * from "./bullet";
+export * from "./event";
