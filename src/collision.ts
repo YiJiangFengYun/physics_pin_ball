@@ -59,11 +59,18 @@ export class CollisionCircle implements ICollision {
         if (bullet.bounds.intersect(targetCircle.bounds)) {
             let normal = Vector.subVectors(bullet.pos, targetCircle.pos);
             let distance = normal.magnitude();
-            if (distance < (bullet.radius + targetCircle.radius)) {
+            if (distance < (bullet.radius + targetCircle.radius) && distance >= targetCircle.radius) {
                 result.collided = true;
                 if (reflexible) {
                     normal.normal();
                     result.normal.copy(normal);
+                }
+            } else if (distance < targetCircle.radius) {
+                result.collided = true;
+                if (reflexible) {
+                    //Directly entirely  rebound
+                    Vector.mulVectorMag(bullet.velocity, -1, result.normal);
+                    result.normal.normal();
                 }
             }
         }
@@ -86,7 +93,11 @@ export class CollisionRectangle implements ICollision {
                 if (circleCenterY > squareBounds.minY && circleCenterY < squareBounds.maxY) {
                     //The center is inside the bounds (namely, inside the square).
                     result.collided = true;
-                    if (reflexible)Vector.normalVector(bullet.velocity, result.normal);
+                    if (reflexible) {
+                         //Directly entirely  rebound
+                        Vector.mulVectorMag(bullet.velocity, -1, result.normal);
+                        result.normal.normal();
+                    }
                 } else if (circleCenterY > squareBounds.maxY) {
                     //The center is downside the bounds.
                     if (circleCenterY - squareBounds.maxY < circleRadius) {
@@ -241,7 +252,11 @@ export class CollisionRhombus implements ICollision {
                 if (circleCenterYRotate > - halfMinSize && circleCenterYRotate < halfMinSize) {
                     //The center is inside the bounds (namely, inside the square).
                     result.collided = true;
-                    if (reflexible)Vector.normalVector(bullet.velocity, result.normal);
+                    if (reflexible) {
+                        //Directly entirely  rebound
+                       Vector.mulVectorMag(bullet.velocity, -1, result.normal);
+                       result.normal.normal();
+                   }
                 } else if (circleCenterYRotate > halfMinSize) {
                     if (circleCenterYRotate - halfMinSize < circleRadius) {
                         result.collided = true;
